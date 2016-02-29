@@ -1,6 +1,7 @@
 #ifndef CLIENTCONTROL_H
 #define CLIENTCONTROL_H
 #include <QtNetwork>
+#include <iostream>
 
 class ClientControl
 {

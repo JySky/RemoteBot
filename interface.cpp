@@ -1,5 +1,7 @@
 #include "interface.h"
 #include "ui_interface.h"
+
+
 Interface::Interface(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Interface)

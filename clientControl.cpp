@@ -33,10 +33,10 @@ void ClientControl::send()
     soc.write(control());
 }
 
-QByteArray control()
+QByteArray ClientControl::control()
 {
     QByteArray toSend;
-    char char7[8];
+    char char7;
     toSend.append((unsigned char)255);
     toSend.append((unsigned char)7);
     toSend.append((unsigned char)leftSpeed);

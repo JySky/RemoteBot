@@ -1,6 +1,7 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
-
+#include "clientcontrol.h"
+#include "config.h"
 #include <QMainWindow>
 
 namespace Ui {

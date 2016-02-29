@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-QT += network
+QT       += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,9 +15,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         interface.cpp \
-    clientcontrol.cpp
+    clientcontrol.cpp \
+    config.cpp
 
 HEADERS  += interface.h \
-    clientcontrol.h
+    clientcontrol.h \
+    config.h
 
-FORMS    += interface.ui
+FORMS    += interface.ui \
+    config.ui
