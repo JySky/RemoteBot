@@ -36,13 +36,13 @@ void ClientControl::send()
 QByteArray ClientControl::control()
 {
     QByteArray toSend;
-    char char7;
+    unsigned char char7;
     toSend.append((unsigned char)255);
     toSend.append((unsigned char)7);
-    toSend.append((unsigned char)leftSpeed);
-    toSend.append((unsigned char)leftSpeed);
-    toSend.append((unsigned char)rightSpeed);
-    toSend.append((unsigned char)rightSpeed);
+    toSend.append(leftSpeedLoop);
+    toSend.append(leftSpeed);
+    toSend.append(rightSpeedLoop);
+    toSend.append(rightSpeed);
 
 
     return toSend;

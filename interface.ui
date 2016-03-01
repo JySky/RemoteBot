@@ -38,39 +38,7 @@
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <widget class="QProgressBar" name="progressBar">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>20</y>
-      <width>118</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>24</number>
-    </property>
-    <property name="textVisible">
-     <bool>false</bool>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-    <property name="invertedAppearance">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLCDNumber" name="lcdNumber_2">
-    <property name="geometry">
-     <rect>
-      <x>480</x>
-      <y>20</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="progressBar_2">
+   <widget class="QProgressBar" name="pbSpeedLF">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -89,7 +57,7 @@
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
-   <widget class="QProgressBar" name="progressBar_3">
+   <widget class="QProgressBar" name="pbSpeedLR">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -111,7 +79,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="frame">
     <property name="geometry">
      <rect>
       <x>36</x>
@@ -124,7 +92,7 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QProgressBar" name="progressBar_4">
+   <widget class="QProgressBar" name="pbSpeedRF">
     <property name="geometry">
      <rect>
       <x>450</x>
@@ -143,7 +111,7 @@
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
-   <widget class="QProgressBar" name="progressBar_5">
+   <widget class="QProgressBar" name="pbSpeedRR">
     <property name="geometry">
      <rect>
       <x>450</x>
@@ -165,7 +133,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QSlider" name="verticalSlider">
+   <widget class="QSlider" name="sliderSpeed">
     <property name="geometry">
      <rect>
       <x>230</x>
@@ -174,11 +142,23 @@
       <height>71</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="sliderPosition">
+     <number>50</number>
+    </property>
     <property name="orientation">
      <enum>Qt::Vertical</enum>
     </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBothSides</enum>
+    </property>
+    <property name="tickInterval">
+     <number>10</number>
+    </property>
    </widget>
-   <widget class="QProgressBar" name="progressBar_6">
+   <widget class="QProgressBar" name="batteryLevel">
     <property name="geometry">
      <rect>
       <x>350</x>
@@ -197,7 +177,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLCDNumber" name="lcdNumber">
+   <widget class="QLCDNumber" name="displayPing">
     <property name="geometry">
      <rect>
       <x>240</x>
@@ -259,10 +239,10 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QLCDNumber" name="lcdNumber_3">
+   <widget class="QLCDNumber" name="displaySpeed">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>160</x>
       <y>380</y>
       <width>64</width>
       <height>21</height>
@@ -330,7 +310,7 @@
      <enum>QLCDNumber::Outline</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="cameraUp">
     <property name="geometry">
      <rect>
       <x>70</x>
@@ -369,7 +349,7 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="cameraDown">
     <property name="geometry">
      <rect>
       <x>70</x>
@@ -382,7 +362,7 @@
      <string>Bas</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="cameraLeft">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -395,7 +375,7 @@
      <string>Gauche</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_4">
+   <widget class="QPushButton" name="cameraRight">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -408,7 +388,7 @@
      <string>Droite</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_5">
+   <widget class="QPushButton" name="robotRight">
     <property name="geometry">
      <rect>
       <x>390</x>
@@ -421,7 +401,7 @@
      <string>Droite</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_6">
+   <widget class="QPushButton" name="robotLeft">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -434,7 +414,7 @@
      <string>Gauche</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_7">
+   <widget class="QPushButton" name="robotDown">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -447,7 +427,7 @@
      <string>Bas</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_8">
+   <widget class="QPushButton" name="robotUp">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -460,20 +440,7 @@
      <string>Haut</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_9">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>520</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Start</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_10">
+   <widget class="QPushButton" name="robotStart">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -483,7 +450,91 @@
      </rect>
     </property>
     <property name="text">
+     <string>Start</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="CameraStart">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>520</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
      <string>Camera</string>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="displaySpeedSet">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>380</y>
+      <width>64</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="palette">
+     <palette>
+      <active>
+       <colorrole role="Text">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </active>
+      <inactive>
+       <colorrole role="Text">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </inactive>
+      <disabled>
+       <colorrole role="Text">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>120</red>
+          <green>120</green>
+          <blue>120</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </disabled>
+     </palette>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>1</number>
+    </property>
+    <property name="midLineWidth">
+     <number>0</number>
+    </property>
+    <property name="smallDecimalPoint">
+     <bool>false</bool>
+    </property>
+    <property name="digitCount">
+     <number>4</number>
+    </property>
+    <property name="mode">
+     <enum>QLCDNumber::Dec</enum>
+    </property>
+    <property name="segmentStyle">
+     <enum>QLCDNumber::Filled</enum>
     </property>
    </widget>
   </widget>
@@ -501,5 +552,22 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>sliderSpeed</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>displaySpeedSet</receiver>
+   <slot>display(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>245</x>
+     <y>486</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>301</x>
+     <y>411</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

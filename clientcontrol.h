@@ -22,8 +22,10 @@ class ClientControl
         QString IP;
         int port;
         QTcpSocket soc;
-        int rightSpeed;
-        int leftSpeed;
+        unsigned char rightSpeed;
+        unsigned char leftSpeed;
+        unsigned char leftSpeedLoop;
+        unsigned char rightSpeedLoop;
         static ClientControl* m_instance;
         QByteArray control();
 
