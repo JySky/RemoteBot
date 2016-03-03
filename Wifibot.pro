@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += network
+QT       += widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,3 +25,5 @@ HEADERS  += interface.h \
 
 FORMS    += interface.ui \
     config.ui
+INCLUDEPATH += C:\opencv\sources\include
+LIBS += "C:\opencv\build\include\*.dll"
