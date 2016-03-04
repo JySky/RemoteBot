@@ -7,6 +7,8 @@ Config::Config(QDialog *parent) :
 {
     ui->setupUi(this);
     Clientcont = ClientControl::getInstance(NULL);
+    IPRobot=Clientcont->getIp();
+    portRobot=Clientcont->getPort();
 }
 
 Config::~Config()
@@ -14,13 +16,10 @@ Config::~Config()
     delete ui;
 }
 
-
-
 void Config::on_OK_clicked()
 {
     Clientcont->setIp(IPRobot);
     Clientcont->setPort(portRobot);
-    connect(ui->OK, SIGNAL(clicked()), this, SIGNAL(closeThisWindow()));
 }
 
 void Config::on_IPCamera_textChanged(const QString &arg1)

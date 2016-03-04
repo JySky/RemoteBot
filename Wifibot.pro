@@ -25,5 +25,3 @@ HEADERS  += interface.h \
 
 FORMS    += interface.ui \
     config.ui
-INCLUDEPATH += C:\opencv\sources\include
-LIBS += "C:\opencv\build\include\*.dll"

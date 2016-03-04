@@ -5,18 +5,16 @@
 Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interface)
 {
     ui->setupUi(this);
-
     Clientcont = ClientControl::getInstance(this);
     connect(ui->menuConfigurer, SIGNAL(aboutToShow()), this, SLOT(displayConfig()));
-
 }
 
 void Interface::displayConfig()
 {
     Config* window= new Config();
     window->exec();
-
 }
+
 void Interface::connectionState(bool test)
 {
     if(test)
@@ -30,19 +28,28 @@ void Interface::keyPressEvent(QKeyEvent *event)
     switch (event->key())
     {
         case Qt::Key_Up:
-
+                Clientcont->setLeftSpeedFlag(1);
+                Clientcont->setRightSpeedFlag(1);
+                Clientcont->setLeftSpeed((int)(ui->displaySpeedSet->value()*2.4));
+                Clientcont->setRightSpeed((int)(ui->displaySpeedSet->value()*2.4));
             break;
 
         case Qt::Key_Down:
-
+                Clientcont->setLeftSpeedFlag(1);
+                Clientcont->setRightSpeedFlag(1);
+                Clientcont->setLeftSpeed((int)(ui->displaySpeedSet->value()*2.4));
+                Clientcont->setRightSpeed((int)(ui->displaySpeedSet->value()*2.4));
             break;
 
         case (Qt::Key_Left):
+                Clientcont->setLeftSpeedFlag(1);
+                Clientcont->setRightSpeedFlag(1);
 
             break;
 
         case (Qt::Key_Right):
-
+                Clientcont->setLeftSpeedFlag(1);
+                Clientcont->setRightSpeedFlag(1);
             break;
 
         case Qt::Key_Z:
@@ -94,6 +101,10 @@ void Interface::on_robotStart_clicked()
     Clientcont->connecttoRobot();
 }
 
+void Interface::setcolorConnected(QString color)
+{
+    ui->colorConnected->setStyleSheet("QLabel#colorConnected { background-color :  "+color+";}");
+}
 
 Interface::~Interface()
 {

@@ -174,5 +174,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>OK</sender>
+   <signal>clicked()</signal>
+   <receiver>Config</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>137</x>
+     <y>221</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>155</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>

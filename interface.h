@@ -3,6 +3,8 @@
 #include "clientcontrol.h"
 #include "config.h"
 #include <QMainWindow>
+#include <iostream>
+#include <stdio.h>
 
 namespace Ui {
 class Interface;
@@ -12,9 +14,6 @@ class Interface : public QMainWindow
 {
     Q_OBJECT
 
-    public:
-        explicit Interface(QWidget *parent = 0);
-        ~Interface();
 
     private:
         QNetworkAccessManager mgr;
@@ -28,7 +27,10 @@ class Interface : public QMainWindow
         void displayConfig();
         void connectionState(bool test);
         void on_robotStart_clicked();
-
+    public:
+        explicit Interface(QWidget *parent = 0);
+        ~Interface();
+        void setcolorConnected(QString color);
 };
 
 #endif // INTERFACE_H
