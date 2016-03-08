@@ -48,7 +48,7 @@
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>0</number>
     </property>
     <property name="textVisible">
      <bool>false</bool>
@@ -67,7 +67,7 @@
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>0</number>
     </property>
     <property name="textVisible">
      <bool>false</bool>
@@ -102,7 +102,7 @@
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>0</number>
     </property>
     <property name="textVisible">
      <bool>false</bool>
@@ -121,7 +121,7 @@
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>0</number>
     </property>
     <property name="textVisible">
      <bool>false</bool>
@@ -171,7 +171,7 @@
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>0</number>
     </property>
     <property name="textVisible">
      <bool>false</bool>
@@ -227,10 +227,10 @@
      </palette>
     </property>
     <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
+     <enum>QFrame::NoFrame</enum>
     </property>
     <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
+     <enum>QFrame::Plain</enum>
     </property>
     <property name="lineWidth">
      <number>6</number>
@@ -289,7 +289,7 @@
      </palette>
     </property>
     <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
+     <enum>QFrame::NoFrame</enum>
     </property>
     <property name="frameShadow">
      <enum>QFrame::Plain</enum>
@@ -310,7 +310,7 @@
      <enum>QLCDNumber::Dec</enum>
     </property>
     <property name="segmentStyle">
-     <enum>QLCDNumber::Outline</enum>
+     <enum>QLCDNumber::Filled</enum>
     </property>
    </widget>
    <widget class="QPushButton" name="cameraUp">
@@ -478,51 +478,14 @@
       <height>21</height>
      </rect>
     </property>
-    <property name="palette">
-     <palette>
-      <active>
-       <colorrole role="Text">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </colorrole>
-      </active>
-      <inactive>
-       <colorrole role="Text">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </colorrole>
-      </inactive>
-      <disabled>
-       <colorrole role="Text">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>120</red>
-          <green>120</green>
-          <blue>120</blue>
-         </color>
-        </brush>
-       </colorrole>
-      </disabled>
-     </palette>
-    </property>
     <property name="frameShape">
-     <enum>QFrame::Box</enum>
+     <enum>QFrame::NoFrame</enum>
     </property>
     <property name="frameShadow">
      <enum>QFrame::Plain</enum>
     </property>
     <property name="lineWidth">
-     <number>1</number>
+     <number>6</number>
     </property>
     <property name="midLineWidth">
      <number>0</number>
@@ -595,6 +558,21 @@
      <string/>
     </property>
    </widget>
+   <widget class="QWebView" name="webView">
+    <property name="geometry">
+     <rect>
+      <x>49</x>
+      <y>59</y>
+      <width>381</width>
+      <height>291</height>
+     </rect>
+    </property>
+    <property name="url">
+     <url>
+      <string>about:blank</string>
+     </url>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -609,12 +587,25 @@
     <property name="title">
      <string>Configurer</string>
     </property>
+    <addaction name="actionPort_et_IP"/>
    </widget>
    <addaction name="menuConfigurer"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionPort_et_IP">
+   <property name="text">
+    <string>Port et IP</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QWebView</class>
+   <extends>QWidget</extends>
+   <header>QtWebKitWidgets/QWebView</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

@@ -5,29 +5,34 @@
 #include <QMainWindow>
 #include <iostream>
 #include <stdio.h>
+#include "clientcamera.h"
 
 namespace Ui {
 class Interface;
 }
 class ClientControl;
+class ClientCamera;
+
 class Interface : public QMainWindow
 {
     Q_OBJECT
-
 
     private:
         QNetworkAccessManager mgr;
         QNetworkRequest req;
         Ui::Interface *ui;
         ClientControl *Clientcont;
+        ClientCamera *Clientcam;
     protected:
         void keyPressEvent(QKeyEvent *event);
         void keyReleaseEvent(QKeyEvent *event);
+
     private slots:
-        void displayConfig();
-        void connectionState(bool test);
         void on_robotStart_clicked();
+        void on_actionPort_et_IP_triggered();
+
     public:
+        Ui::Interface *getUi(){return ui;}
         explicit Interface(QWidget *parent = 0);
         ~Interface();
         void setcolorConnected(QString color);

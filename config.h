@@ -1,12 +1,14 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 #include "clientcontrol.h"
+#include "clientcamera.h"
 #include <QDialog>
 
 namespace Ui {
 class Config;
 }
 class ClientControl;
+class ClientCamera;
 
 class Config : public QDialog
 {
@@ -17,7 +19,6 @@ class Config : public QDialog
         ~Config();
 
     private slots:
-        void on_OK_clicked();
 
         void on_IPCamera_textChanged(const QString &arg1);
 
@@ -33,6 +34,7 @@ class Config : public QDialog
         int portCamera;
         int portRobot;
         ClientControl* Clientcont;
+        ClientCamera* Clientcam;
         Ui::Config *ui;
 };
 

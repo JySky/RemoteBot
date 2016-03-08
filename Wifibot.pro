@@ -7,6 +7,8 @@
 QT       += core gui
 QT       += network
 QT       += widgets
+QT       += webkit
+QT       += webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,22 +21,15 @@ SOURCES += main.cpp\
     clientcontrol.cpp \
     config.cpp \
     cameratraitement.cpp \
-    clientreceivetraitement.cpp
+    clientreceivetraitement.cpp \
+    clientcamera.cpp
 
 HEADERS  += interface.h \
     clientcontrol.h \
     config.h \
     cameratraitement.h \
-    clientreceivetraitement.h
+    clientreceivetraitement.h \
+    clientcamera.h
 
 FORMS    += interface.ui \
     config.ui
-
-INCLUDEPATH += C:/OpencvQT/install/include
-
-LIBS += -LC:\\OpencvQT\\bin \
-    libopencv_core310 \
-    libopencv_highgui310 \
-    libopencv_imgproc310 \
-    libopencv_features2d310 \
-    libopencv_calib3d310 \

@@ -6,22 +6,9 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interfac
 {
     ui->setupUi(this);
     Clientcont = ClientControl::getInstance(this);
-    connect(ui->menuConfigurer, SIGNAL(aboutToShow()), this, SLOT(displayConfig()));
+    Clientcam = ClientCamera::getInstance(this);
 }
 
-void Interface::displayConfig()
-{
-    Config* window= new Config();
-    window->exec();
-}
-
-void Interface::connectionState(bool test)
-{
-    if(test)
-        this->setStyleSheet("QLabel#colorConnected { background-color : green;}");
-    else
-        this->setStyleSheet("QLabel#colorConnected  { background-color : red;}");
-}
 
 void Interface::keyPressEvent(QKeyEvent *event)
 {
@@ -53,22 +40,22 @@ void Interface::keyPressEvent(QKeyEvent *event)
             break;
 
         case Qt::Key_Z:
-            req.setUrl((QUrl(QString("http://"+Clientcont->getIp()+":"+Clientcont->getPort()+"/?action=command&dest=0&plugin=0&id=10094853&group=1&value=-200"))));
+            req.setUrl((QUrl(QString("http://"+Clientcam->getIp()+":"+Clientcam->getPort()+"/?action=command&dest=0&plugin=0&id=10094853&group=1&value=-200"))));
             mgr.get(req);
             break;
 
         case Qt::Key_S:
-            req.setUrl((QUrl(QString("http://"+Clientcont->getIp()+":"+Clientcont->getPort()+"/?action=command&dest=0&plugin=0&id=10094853&group=1&value=200"))));
+            req.setUrl((QUrl(QString("http://"+Clientcam->getIp()+":"+Clientcam->getPort()+"/?action=command&dest=0&plugin=0&id=10094853&group=1&value=200"))));
             mgr.get(req);
             break;
 
         case Qt::Key_Q:
-            req.setUrl((QUrl(QString("http://"+Clientcont->getIp()+":"+Clientcont->getPort()+"/?action=command&dest=0&plugin=0&id=10094852&group=1&value=200"))));
+            req.setUrl((QUrl(QString("http://"+Clientcam->getIp()+":"+Clientcam->getPort()+"/?action=command&dest=0&plugin=0&id=10094852&group=1&value=200"))));
             mgr.get(req);
             break;
 
         case Qt::Key_D:
-            req.setUrl((QUrl(QString("http://"+Clientcont->getIp()+":"+Clientcont->getPort()+"/?action=command&dest=0&plugin=0&id=10094852&group=1&value=-200"))));
+            req.setUrl((QUrl(QString("http://"+Clientcam->getIp()+":"+Clientcam->getPort()+"/?action=command&dest=0&plugin=0&id=10094852&group=1&value=-200"))));
             mgr.get(req);
             break;
     }
@@ -99,6 +86,7 @@ void Interface::keyReleaseEvent(QKeyEvent *event)
 void Interface::on_robotStart_clicked()
 {
     Clientcont->connecttoRobot();
+    Clientcam->connecttoRobot();
 }
 
 void Interface::setcolorConnected(QString color)
@@ -111,6 +99,8 @@ Interface::~Interface()
     delete ui;
 }
 
-
-
-
+void Interface::on_actionPort_et_IP_triggered()
+{
+    Config* window= new Config();
+    window->exec();
+}
