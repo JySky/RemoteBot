@@ -49,13 +49,8 @@ void ClientControl::connecttoRobot()
 
     if(!soc.waitForConnected(5000))
     {
-       /* QMessageBox msgBox;
-        QMessageBox::warning(msgBox,"Connection Failed","Connection failed on : "+IP+":"+port);*/
-        /*cout<<"fail";*/
-        //emit valueChanged(false);
         MainInter->setcolorConnected("red");
         connected=false;
-
     }
     else
     {
