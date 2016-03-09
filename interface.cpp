@@ -87,6 +87,7 @@ void Interface::on_robotStart_clicked()
 {
     Clientcont->connecttoRobot();
     Clientcam->connecttoRobot();
+    ui->webView->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));
 }
 
 void Interface::setcolorConnected(QString color)
