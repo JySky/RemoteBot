@@ -5,8 +5,12 @@
 #include <QMessageBox>
 #include "interface.h"
 #include <QMainWindow>
+#include "clientsend.h"
+#include "clientreceivetraitement.h"
 
 class Interface;
+class ClientSend;
+class ClientReceiveTraitement;
 
 class ClientControl
 {
@@ -23,11 +27,11 @@ class ClientControl
         unsigned char leftSpeedFlag;
         Interface* MainInter;
         static ClientControl* m_instance;
-        QByteArray control();
         ClientControl(Interface *inter);
         ~ClientControl();
 
     public:
+        static ClientControl* getInstance(){return m_instance;}
         static ClientControl* getInstance(Interface* inter)
         {
             if ( m_instance == NULL )
@@ -37,9 +41,9 @@ class ClientControl
             return m_instance;
         }
         void receive();
-        void send();
         void init();
         void connecttoRobot();
+        void stopConnectionRobot();
         void setRightSpeed(unsigned char speed);
         void setLeftSpeed(unsigned char speed);
         void setRightSpeedFlag(unsigned char flag);
@@ -48,6 +52,8 @@ class ClientControl
         void setPort(int p);
         unsigned char getLeftSpeedFlag(){return leftSpeedFlag;}
         unsigned char getRightSpeedFlag(){return rightSpeedFlag;}
+        unsigned char getLeftSpeedLoop(){return leftSpeedLoop;}
+        unsigned char getRightSpeedLoop(){return rightSpeedLoop;}
         unsigned char getRightSpeed(){return rightSpeed;}
         unsigned char getLeftSpeed(){return leftSpeed;}
         unsigned char getConnected(){return connected;}

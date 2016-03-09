@@ -31,7 +31,9 @@ class Interface : public QMainWindow
         void on_robotStart_clicked();
         void on_actionPort_et_IP_triggered();
 
-    public:
+        void on_robotStop_clicked();
+
+public:
         Ui::Interface *getUi(){return ui;}
         explicit Interface(QWidget *parent = 0);
         ~Interface();

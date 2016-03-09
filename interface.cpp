@@ -7,6 +7,7 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interfac
     ui->setupUi(this);
     Clientcont = ClientControl::getInstance(this);
     Clientcam = ClientCamera::getInstance(this);
+    //ui->webView->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));
 }
 
 
@@ -28,7 +29,7 @@ void Interface::keyPressEvent(QKeyEvent *event)
                 Clientcont->setRightSpeed((int)(ui->displaySpeedSet->value()*2.4));
             break;
 
-        case (Qt::Key_Left):
+        case Qt::Key_Left:
                 Clientcont->setLeftSpeedFlag(1);
                 Clientcont->setRightSpeedFlag(1);
 
@@ -87,7 +88,7 @@ void Interface::on_robotStart_clicked()
 {
     Clientcont->connecttoRobot();
     Clientcam->connecttoRobot();
-    ui->webView->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));
+    //ui->webView->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));
 }
 
 void Interface::setcolorConnected(QString color)
@@ -104,4 +105,9 @@ void Interface::on_actionPort_et_IP_triggered()
 {
     Config* window= new Config();
     window->exec();
+}
+
+void Interface::on_robotStop_clicked()
+{
+    Clientcont->stopConnectionRobot();
 }

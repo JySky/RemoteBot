@@ -18,31 +18,6 @@ ClientControl::ClientControl(Interface *inter)
     connected=false;
 }
 
-void ClientControl::send()
-{
-    soc.write(control());
-}
-
-QByteArray ClientControl::control()
-{
-    QByteArray toSend;
-    unsigned char char7=0;
-    toSend.append((unsigned char)255);//char1
-    toSend.append((unsigned char)7);//char2
-    toSend.append(leftSpeed);//char3
-    toSend.append(leftSpeed);//char4
-    toSend.append(rightSpeed);//char5
-    toSend.append(rightSpeed);//char6
-    //char7 build
-    char7+=128*leftSpeedLoop;
-    char7+=64*leftSpeedFlag;
-    char7+=32*leftSpeedLoop;
-    char7+=16*rightSpeedFlag;
-    char7+=8*0;
-    toSend.append(char7);//char7
-    return toSend;
-}
-
 void ClientControl::connecttoRobot()
 {
     soc.connectToHost(IP,port);
@@ -56,6 +31,8 @@ void ClientControl::connecttoRobot()
     {
         MainInter->setcolorConnected("green");
         connected=true;
+        ClientSend::getInstance(&soc);
+        ClientReceiveTraitement::getInstance(&soc);
     }
 }
 
@@ -86,6 +63,10 @@ void ClientControl::setIp(QString i)
 void ClientControl::setPort(int p)
 {
     port = p;
+}
+void ClientControl::stopConnectionRobot()
+{
+    soc.close();
 }
 
 ClientControl::~ClientControl()

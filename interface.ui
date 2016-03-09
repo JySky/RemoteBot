@@ -446,7 +446,7 @@
    <widget class="QPushButton" name="robotStart">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>290</x>
       <y>530</y>
       <width>75</width>
       <height>23</height>
@@ -459,7 +459,7 @@
    <widget class="QPushButton" name="CameraStart">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>10</x>
       <y>530</y>
       <width>75</width>
       <height>23</height>
@@ -571,6 +571,19 @@
      <url>
       <string>about:blank</string>
      </url>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="robotStop">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>530</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop</string>
     </property>
    </widget>
   </widget>

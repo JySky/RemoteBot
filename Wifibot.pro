@@ -22,14 +22,18 @@ SOURCES += main.cpp\
     config.cpp \
     cameratraitement.cpp \
     clientreceivetraitement.cpp \
-    clientcamera.cpp
+    clientcamera.cpp \
+    clientsend.cpp \
+    robotinfo.cpp
 
 HEADERS  += interface.h \
     clientcontrol.h \
     config.h \
     cameratraitement.h \
     clientreceivetraitement.h \
-    clientcamera.h
+    clientcamera.h \
+    clientsend.h \
+    robotinfo.h
 
 FORMS    += interface.ui \
     config.ui
