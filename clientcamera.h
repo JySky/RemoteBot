@@ -32,7 +32,7 @@ class ClientCamera
         void setPort(int p);
         QString getIp(){return IP;}
         int getPort(){return port;}
-        void connecttoRobot();
+        void connecttoCamera();
 };
 
 #endif // CLIENTCAMERA_H

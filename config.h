@@ -28,7 +28,9 @@ class Config : public QDialog
 
         void on_IPRobot_textChanged(const QString &arg1);
 
-    private:
+        void on_buttonBox_accepted();
+
+private:
         QString IPCamera;
         QString IPRobot;
         int portCamera;

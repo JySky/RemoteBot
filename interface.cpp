@@ -15,27 +15,27 @@ void Interface::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
-        case Qt::Key_Up:
+        case Qt::Key_I:
                 Clientcont->setLeftSpeedFlag(1);
                 Clientcont->setRightSpeedFlag(1);
                 Clientcont->setLeftSpeed((int)(ui->displaySpeedSet->value()*2.4));
                 Clientcont->setRightSpeed((int)(ui->displaySpeedSet->value()*2.4));
             break;
 
-        case Qt::Key_Down:
+        case Qt::Key_K:
                 Clientcont->setLeftSpeedFlag(1);
                 Clientcont->setRightSpeedFlag(1);
                 Clientcont->setLeftSpeed((int)(ui->displaySpeedSet->value()*2.4));
                 Clientcont->setRightSpeed((int)(ui->displaySpeedSet->value()*2.4));
             break;
 
-        case Qt::Key_Left:
+        case Qt::Key_J:
                 Clientcont->setLeftSpeedFlag(1);
                 Clientcont->setRightSpeedFlag(1);
 
             break;
 
-        case (Qt::Key_Right):
+        case Qt::Key_L:
                 Clientcont->setLeftSpeedFlag(1);
                 Clientcont->setRightSpeedFlag(1);
             break;
@@ -66,19 +66,19 @@ void Interface::keyReleaseEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
-        case Qt::Key_Up:
+        case Qt::Key_I:
 
             break;
 
-        case Qt::Key_Down:
+        case Qt::Key_K:
 
             break;
 
-        case Qt::Key_Left:
+        case Qt::Key_J:
 
             break;
 
-        case Qt::Key_Right:
+        case Qt::Key_L:
 
             break;
     }
@@ -87,7 +87,7 @@ void Interface::keyReleaseEvent(QKeyEvent *event)
 void Interface::on_robotStart_clicked()
 {
     Clientcont->connecttoRobot();
-    Clientcam->connecttoRobot();
+    Clientcam->connecttoCamera();
     //ui->webView->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));
 }
 
@@ -110,4 +110,11 @@ void Interface::on_actionPort_et_IP_triggered()
 void Interface::on_robotStop_clicked()
 {
     Clientcont->stopConnectionRobot();
+    this->setcolorConnected("red");
+}
+void Interface::majInterface(RobotInfo dataR, RobotInfo dataL)
+{
+    ui->batteryLevel->setValue((int)(dataL.getBatLevel()/2.55));
+    ui->displaySpeed->display(5);
+
 }

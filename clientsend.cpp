@@ -20,6 +20,7 @@ void ClientSend::run()
 void ClientSend::send()
 {
     soc->write(control());
+    soc->waitForBytesWritten(1000);
 }
 
 QByteArray ClientSend::control()

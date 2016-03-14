@@ -1,26 +1,31 @@
-#include "clientreceivetraitement.h"
+#include "clientreceive.h"
 
-ClientReceiveTraitement* ClientReceiveTraitement::m_instance = NULL;
+ClientReceive* ClientReceive::m_instance = NULL;
 
-ClientReceiveTraitement::ClientReceiveTraitement(QTcpSocket *soc)
+ClientReceive::ClientReceive(QTcpSocket *soc, Interface *inter)
 {
     this->soc=soc;
+    this->MainInter=inter;
+    stopR=true;
     this->start();
 }
 
-void ClientReceiveTraitement::run()
-{
-
-    while(1)
-    {
-        QThread::msleep(25);
-        receive();
-    }
-}
-void ClientReceiveTraitement::receive()
+void ClientReceive::run()
 {
     QByteArray data;
-    data=soc->read(21);
+    while(stopR)
+    {
+       while(soc->bytesAvailable()>20)
+       {
+            data=soc->read(21);
+            receive(data);
+            QThread::msleep(25);
+       }
+    }
+}
+
+void ClientReceive::receive(QByteArray data)
+{
     RobotInfo dataL;
     RobotInfo dataR;
     dataL.setSpeedFront((int)((data.at(1) << 8) + data.at(0)));
@@ -41,9 +46,12 @@ void ClientReceiveTraitement::receive()
     dataR.setCurrent(data.at(17));
     dataL.setVersion(data.at(18));
     dataR.setVersion(data.at(18));
+    MainInter->majInterface(dataR,dataL);
 }
 
-ClientReceiveTraitement::~ClientReceiveTraitement()
+ClientReceive::~ClientReceive()
 {
-
+    stop();
+    this->exit();
+    delete this;
 }

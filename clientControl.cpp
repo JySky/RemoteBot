@@ -32,7 +32,7 @@ void ClientControl::connecttoRobot()
         MainInter->setcolorConnected("green");
         connected=true;
         ClientSend::getInstance(&soc);
-        ClientReceiveTraitement::getInstance(&soc);
+        ClientReceive::getInstance(&soc,MainInter);
     }
 }
 

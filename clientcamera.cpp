@@ -11,7 +11,7 @@ ClientCamera::ClientCamera(Interface *inter)
     IP="192.168.1.106";
 }
 
-void ClientCamera::connecttoRobot()
+void ClientCamera::connecttoCamera()
 {
     //soc.connectToHost(IP,port);
     //MainInter->getUi()->WebView->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));

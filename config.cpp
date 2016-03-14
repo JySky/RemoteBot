@@ -12,21 +12,16 @@ Config::Config(QDialog *parent) :
     portRobot=Clientcont->getPort();
     IPCamera=Clientcam->getIp();
     portCamera=Clientcam->getPort();
+    ui->IPCamera->setText(IPCamera);
+    ui->IPRobot->setText(IPRobot);
+    ui->PortRobot->setText(QString::number(portRobot));
+    ui->PortCamera->setText(QString::number(portCamera));
 }
 
 Config::~Config()
 {
     delete ui;
 }
-
-/*void Config::on_OK_clicked()
-{
-    Clientcont->setIp(IPRobot);
-    Clientcont->setPort(portRobot);
-    Clientcam->setIp(IPCamera);
-    Clientcam->setPort(portCamera);
-
-}*/
 
 void Config::on_IPCamera_textChanged(const QString &arg1)
 {
@@ -48,4 +43,12 @@ void Config::on_PortRobot_textChanged(const QString &arg1)
 void Config::on_IPRobot_textChanged(const QString &arg1)
 {
     IPRobot=arg1;
+}
+
+void Config::on_buttonBox_accepted()
+{
+    Clientcont->setIp(IPRobot);
+    Clientcont->setPort(portRobot);
+    Clientcam->setIp(IPCamera);
+    Clientcam->setPort(portCamera);
 }

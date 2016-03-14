@@ -6,11 +6,11 @@
 #include "interface.h"
 #include <QMainWindow>
 #include "clientsend.h"
-#include "clientreceivetraitement.h"
+#include "clientreceive.h"
 
 class Interface;
 class ClientSend;
-class ClientReceiveTraitement;
+class ClientReceive;
 
 class ClientControl
 {

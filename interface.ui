@@ -34,7 +34,16 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonIconOnly</enum>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
@@ -173,17 +182,23 @@
     <property name="value">
      <number>0</number>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+    </property>
     <property name="textVisible">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="invertedAppearance">
      <bool>true</bool>
+    </property>
+    <property name="textDirection">
+     <enum>QProgressBar::TopToBottom</enum>
     </property>
    </widget>
    <widget class="QLCDNumber" name="displayPing">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>200</x>
       <y>10</y>
       <width>64</width>
       <height>21</height>
@@ -400,6 +415,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::WheelFocus</enum>
+    </property>
     <property name="text">
      <string>Droite</string>
     </property>
@@ -456,7 +474,7 @@
      <string>Start</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="CameraStart">
+   <widget class="QPushButton" name="cameraStart">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -529,7 +547,7 @@
      <string>Mouvement</string>
     </property>
    </widget>
-   <widget class="QLabel" name="Connected">
+   <widget class="QLabel" name="connected">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -584,6 +602,32 @@
     </property>
     <property name="text">
      <string>Stop</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="pingLabel">
+    <property name="geometry">
+     <rect>
+      <x>186</x>
+      <y>10</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ping</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="batteryLabel">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>10</y>
+      <width>47</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Bat.</string>
     </property>
    </widget>
   </widget>

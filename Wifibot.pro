@@ -15,25 +15,25 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Wifibot
 TEMPLATE = app
 
-
+win32: RC_ICONS = RemoteBot.ico
 SOURCES += main.cpp\
         interface.cpp \
     clientcontrol.cpp \
     config.cpp \
     cameratraitement.cpp \
-    clientreceivetraitement.cpp \
     clientcamera.cpp \
     clientsend.cpp \
-    robotinfo.cpp
+    robotinfo.cpp \
+    clientreceive.cpp
 
 HEADERS  += interface.h \
     clientcontrol.h \
     config.h \
     cameratraitement.h \
-    clientreceivetraitement.h \
     clientcamera.h \
     clientsend.h \
-    robotinfo.h
+    robotinfo.h \
+    clientreceive.h
 
 FORMS    += interface.ui \
     config.ui

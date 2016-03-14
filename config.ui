@@ -35,7 +35,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>192.168.1.106</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLineEdit" name="PortRobot">
@@ -48,7 +48,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>15020</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLineEdit" name="IPCamera">
@@ -61,7 +61,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>192.168.1.106</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLineEdit" name="PortCamera">
@@ -74,7 +74,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>8080</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="IP_Camera">
