@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "clientcamera.h"
 #include "robotinfo.h"
+#include "clickablelabel.h"
 
 namespace Ui {
 class Interface;
@@ -32,9 +33,25 @@ class Interface : public QMainWindow
         private slots:
             void on_robotStart_clicked();
             void on_actionPort_et_IP_triggered();
-
             void on_robotStop_clicked();
 
+            void on_cameraLeft_clicked();
+            void on_cameraLeft_released();
+            void on_cameraUp_released();
+            void on_cameraUp_clicked();
+            void on_cameraDown_released();
+            void on_cameraDown_clicked();
+            void on_cameraRight_released();
+            void on_cameraRight_clicked();
+
+            void on_robotRight_clicked();
+            void on_robotRight_released();
+            void on_robotUp_clicked();
+            void on_robotUp_released();
+            void on_robotDown_clicked();
+            void on_robotDown_released();
+            void on_robotLeft_clicked();
+            void on_robotLeft_released();
         signals:
             void newvalue(int value);
         public:

@@ -8,6 +8,7 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interfac
     Clientcont = ClientControl::getInstance(this);
     Clientcam = ClientCamera::getInstance(this);
     //ui->webView->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));
+    //connect(ui->cameraLeft,SIGNAL(clicked()),this,SLOT(on_cameraLeft_clicked()));
 }
 
 
@@ -112,9 +113,104 @@ void Interface::on_robotStop_clicked()
     Clientcont->stopConnectionRobot();
     this->setcolorConnected("red");
 }
+
 void Interface::majInterface(RobotInfo dataR, RobotInfo dataL)
 {
     ui->batteryLevel->setValue((int)(dataL.getBatLevel()/2.55));
     ui->displaySpeed->display(5);
 
 }
+
+//************** CONTROLE CAMERA **************//
+
+void Interface::on_cameraLeft_clicked()
+{
+    QPixmap mypix (":/image/image/arrowLeftPressed.png");
+    ui->cameraLeft->setPixmap(mypix);
+}
+void Interface::on_cameraLeft_released()
+{
+    QPixmap mypix (":/image/image/arrowLeft.png");
+    ui->cameraLeft->setPixmap(mypix);
+}
+void Interface::on_cameraUp_released()
+{
+    QPixmap mypix (":/image/image/arrowUp.png");
+    ui->cameraUp->setPixmap(mypix);
+}
+void Interface::on_cameraUp_clicked()
+{
+    QPixmap mypix (":/image/image/arrowUpPressed.png");
+    ui->cameraUp->setPixmap(mypix);
+}
+void Interface::on_cameraDown_released()
+{
+    QPixmap mypix (":/image/image/arrowDown.png");
+    ui->cameraDown->setPixmap(mypix);
+}
+void Interface::on_cameraDown_clicked()
+{
+    QPixmap mypix (":/image/image/arrowDownPressed.png");
+    ui->cameraDown->setPixmap(mypix);
+}
+void Interface::on_cameraRight_released()
+{
+    QPixmap mypix (":/image/image/arrowRight.png");
+    ui->cameraRight->setPixmap(mypix);
+}
+void Interface::on_cameraRight_clicked()
+{
+    QPixmap mypix (":/image/image/arrowRightPressed.png");
+    ui->cameraRight->setPixmap(mypix);
+}
+
+//************** CONTROLE ROBOT **************//
+
+void Interface::on_robotRight_clicked()
+{
+    QPixmap mypix (":/image/image/arrowRightPressed.png");
+    ui->robotRight->setPixmap(mypix);
+}
+
+void Interface::on_robotRight_released()
+{
+    QPixmap mypix (":/image/image/arrowRight.png");
+    ui->robotRight->setPixmap(mypix);
+}
+
+void Interface::on_robotUp_clicked()
+{
+    QPixmap mypix (":/image/image/arrowUpPressed.png");
+    ui->robotUp->setPixmap(mypix);
+}
+
+void Interface::on_robotUp_released()
+{
+    QPixmap mypix (":/image/image/arrowUp.png");
+    ui->robotUp->setPixmap(mypix);
+}
+
+void Interface::on_robotDown_clicked()
+{
+    QPixmap mypix (":/image/image/arrowDownPressed.png");
+    ui->robotDown->setPixmap(mypix);
+}
+
+void Interface::on_robotDown_released()
+{
+    QPixmap mypix (":/image/image/arrowDown.png");
+    ui->robotDown->setPixmap(mypix);
+}
+
+void Interface::on_robotLeft_clicked()
+{
+    QPixmap mypix (":/image/image/arrowLeftPressed.png");
+    ui->robotLeft->setPixmap(mypix);
+}
+
+void Interface::on_robotLeft_released()
+{
+    QPixmap mypix (":/image/image/arrowLeft.png");
+    ui->robotLeft->setPixmap(mypix);
+}
+

@@ -146,7 +146,7 @@
     <property name="geometry">
      <rect>
       <x>230</x>
-      <y>430</y>
+      <y>420</y>
       <width>31</width>
       <height>71</height>
      </rect>
@@ -260,8 +260,8 @@
    <widget class="QLCDNumber" name="displaySpeed">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>380</y>
+      <x>230</x>
+      <y>370</y>
       <width>64</width>
       <height>21</height>
      </rect>
@@ -328,24 +328,11 @@
      <enum>QLCDNumber::Filled</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="cameraUp">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>430</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Haut</string>
-    </property>
-   </widget>
    <widget class="Line" name="line">
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>360</y>
+      <y>350</y>
       <width>381</width>
       <height>20</height>
      </rect>
@@ -358,7 +345,7 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>30</y>
+      <y>40</y>
       <width>381</width>
       <height>20</height>
      </rect>
@@ -367,104 +354,10 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="cameraDown">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>490</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Bas</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="cameraLeft">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>460</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Gauche</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="cameraRight">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>460</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Droite</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="robotRight">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>460</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="focusPolicy">
-     <enum>Qt::WheelFocus</enum>
-    </property>
-    <property name="text">
-     <string>Droite</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="robotLeft">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>460</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Gauche</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="robotDown">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>490</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Bas</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="robotUp">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>430</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Haut</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="robotStart">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>160</x>
       <y>530</y>
       <width>75</width>
       <height>23</height>
@@ -490,8 +383,8 @@
    <widget class="QLCDNumber" name="displaySpeedSet">
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>380</y>
+      <x>210</x>
+      <y>500</y>
       <width>64</width>
       <height>21</height>
      </rect>
@@ -521,11 +414,11 @@
      <enum>QLCDNumber::Filled</enum>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="camera">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>410</y>
+      <x>80</x>
+      <y>380</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -534,11 +427,11 @@
      <string>Camera</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="Mouvement">
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>410</y>
+      <y>380</y>
       <width>61</width>
       <height>16</height>
      </rect>
@@ -594,7 +487,7 @@
    <widget class="QPushButton" name="robotStop">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>260</x>
       <y>530</y>
       <width>75</width>
       <height>23</height>
@@ -630,6 +523,236 @@
      <string>Bat.</string>
     </property>
    </widget>
+   <widget class="ClickableLabel" name="cameraUp">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>410</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowUp.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="dotCamera">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>440</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowDot.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="ClickableLabel" name="cameraRight">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>440</y>
+      <width>21</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowRight.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="ClickableLabel" name="cameraLeft">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>440</y>
+      <width>21</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowLeft.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="wordWrap">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="ClickableLabel" name="cameraDown">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>490</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowDown.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="ClickableLabel" name="robotLeft">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>440</y>
+      <width>21</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowLeft.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="dotRobot">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>440</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowDot.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="ClickableLabel" name="robotUp">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>410</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowUp.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="ClickableLabel" name="robotDown">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>490</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="mouseTracking">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowDown.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="openExternalLinks">
+     <bool>false</bool>
+    </property>
+    <property name="textInteractionFlags">
+     <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+    </property>
+   </widget>
+   <widget class="ClickableLabel" name="robotRight">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>440</y>
+      <width>21</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16777215</width>
+      <height>41</height>
+     </size>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/arrowRight.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="camera_2">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>370</y>
+      <width>47</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Speed</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -644,7 +767,15 @@
     <property name="title">
      <string>Configurer</string>
     </property>
+    <widget class="QMenu" name="menuOption">
+     <property name="title">
+      <string>Option</string>
+     </property>
+     <addaction name="actionActiver_Traitement_Image"/>
+     <addaction name="actionActiver_Manette"/>
+    </widget>
     <addaction name="actionPort_et_IP"/>
+    <addaction name="menuOption"/>
    </widget>
    <addaction name="menuConfigurer"/>
   </widget>
@@ -652,6 +783,16 @@
   <action name="actionPort_et_IP">
    <property name="text">
     <string>Port et IP</string>
+   </property>
+  </action>
+  <action name="actionActiver_Traitement_Image">
+   <property name="text">
+    <string>Activer Traitement Image</string>
+   </property>
+  </action>
+  <action name="actionActiver_Manette">
+   <property name="text">
+    <string>Activer Manette</string>
    </property>
   </action>
  </widget>
@@ -662,8 +803,15 @@
    <extends>QWidget</extends>
    <header>QtWebKitWidgets/QWebView</header>
   </customwidget>
+  <customwidget>
+   <class>ClickableLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">clickablelabel.h</header>
+  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="remotebot.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>sliderSpeed</sender>
@@ -676,8 +824,8 @@
      <y>486</y>
     </hint>
     <hint type="destinationlabel">
-     <x>301</x>
-     <y>411</y>
+     <x>313</x>
+     <y>421</y>
     </hint>
    </hints>
   </connection>

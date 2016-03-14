@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     clientcamera.cpp \
     clientsend.cpp \
     robotinfo.cpp \
-    clientreceive.cpp
+    clientreceive.cpp \
+    clickablelabel.cpp
 
 HEADERS  += interface.h \
     clientcontrol.h \
@@ -33,7 +34,11 @@ HEADERS  += interface.h \
     clientcamera.h \
     clientsend.h \
     robotinfo.h \
-    clientreceive.h
+    clientreceive.h \
+    clickablelabel.h
 
 FORMS    += interface.ui \
     config.ui
+
+RESOURCES += \
+    remotebot.qrc
