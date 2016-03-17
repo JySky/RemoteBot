@@ -22,9 +22,7 @@ SOURCES += main.cpp\
     config.cpp \
     cameratraitement.cpp \
     clientcamera.cpp \
-    clientsend.cpp \
     robotinfo.cpp \
-    clientreceive.cpp \
     clickablelabel.cpp
 
 HEADERS  += interface.h \
@@ -32,9 +30,7 @@ HEADERS  += interface.h \
     config.h \
     cameratraitement.h \
     clientcamera.h \
-    clientsend.h \
     robotinfo.h \
-    clientreceive.h \
     clickablelabel.h
 
 FORMS    += interface.ui \

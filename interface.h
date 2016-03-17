@@ -8,6 +8,11 @@
 #include "clientcamera.h"
 #include "robotinfo.h"
 #include "clickablelabel.h"
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QIcon>
+#include <QString>
+#include <iostream>
 
 namespace Ui {
 class Interface;
@@ -26,6 +31,16 @@ class Interface : public QMainWindow
             Ui::Interface *ui;
             ClientControl *Clientcont;
             ClientCamera *Clientcam;
+            bool Ipressed;
+            bool Jpressed;
+            bool Kpressed;
+            bool Lpressed;
+            bool Zpressed;
+            bool Qpressed;
+            bool Spressed;
+            bool Dpressed;
+            void ControlDirection();
+            void ControlCam();
         protected:
             void keyPressEvent(QKeyEvent *event);
             void keyReleaseEvent(QKeyEvent *event);
@@ -60,6 +75,8 @@ class Interface : public QMainWindow
             ~Interface();
             void setcolorConnected(QString color);
             void majInterface(RobotInfo dataR, RobotInfo dataL);
+            void setQWebView(QString link);
+            void setImage(QImage img);
 };
 
 #endif // INTERFACE_H

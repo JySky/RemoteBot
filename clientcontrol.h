@@ -5,19 +5,24 @@
 #include <QMessageBox>
 #include "interface.h"
 #include <QMainWindow>
-#include "clientsend.h"
-#include "clientreceive.h"
+#include <QTimer>
+#include <QObject>
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QIcon>
+#include <QString>
 
 class Interface;
-class ClientSend;
-class ClientReceive;
 
-class ClientControl
+class ClientControl: public QObject
 {
+    Q_OBJECT
+
     private:
         QString IP;
         int port;
         QTcpSocket soc;
+        QTimer timer,timer2;
         bool connected;
         unsigned char rightSpeed;
         unsigned char leftSpeed;
@@ -28,7 +33,17 @@ class ClientControl
         Interface* MainInter;
         static ClientControl* m_instance;
         ClientControl(Interface *inter);
+        QByteArray control();
+        void receive(QByteArray data);
+        quint16 Crc16(QByteArray* byteArray, int pos);
+        void send();
+        void processing();
         ~ClientControl();
+
+    private slots:
+        void dataWrite();
+        void dataRead();
+        void disconnected();
 
     public:
         static ClientControl* getInstance(){return m_instance;}
@@ -42,8 +57,8 @@ class ClientControl
         }
         void receive();
         void init();
-        void connecttoRobot();
-        void stopConnectionRobot();
+        bool connecttoRobot();
+        bool stopConnectionRobot();
         void setRightSpeed(unsigned char speed);
         void setLeftSpeed(unsigned char speed);
         void setRightSpeedFlag(unsigned char flag);
@@ -59,6 +74,7 @@ class ClientControl
         unsigned char getConnected(){return connected;}
         QString getIp(){return IP;}
         int getPort(){return port;}
+        QTcpSocket* getSocket(){return &soc;}
 };
 
 #endif // CLIENTCONTROL_H

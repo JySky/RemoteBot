@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <iostream>
 
+
 class CameraTraitement : public QThread
 {
         Q_OBJECT

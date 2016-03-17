@@ -16,24 +16,95 @@ ClientControl::ClientControl(Interface *inter)
     leftSpeedLoop=0;
     rightSpeedLoop=0;
     connected=false;
+    connect(&soc, SIGNAL(disconnected()),this, SLOT(disconnected()));
+
+
+    //connect(soc, SIGNAL(connected()),this, SLOT(connected()));
+
+    //connect(soc, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64)));
+    //QObject::connect(soc, SIGNAL(readyRead()),this, SLOT(dataRead()));
+
 }
 
-void ClientControl::connecttoRobot()
+void ClientControl::processing()
+{
+    timer.setInterval(100);
+    timer2.setInterval(100);
+    //connect(&soc, SIGNAL(readyRead()),this, SLOT(dataRead()));
+    connect(&timer, SIGNAL (timeout()), this, SLOT (dataWrite()));
+    connect(&timer2, SIGNAL (timeout()), this, SLOT (dataRead()));
+    timer.start();
+    timer2.start();
+
+}
+
+void ClientControl::dataWrite()
+{
+    if(soc.open(QIODevice::ReadWrite))
+    {
+        send();
+    }
+}
+void ClientControl::dataRead()
+{
+    if(soc.open(QIODevice::ReadWrite))
+    {
+        /*//qDebug()<<"send";
+         //soc.waitForBytesWritten();
+         soc.waitForReadyRead(50);
+         QByteArray data;
+         data.clear();
+         if(soc.canReadLine())//((soc.bytesAvailable())>20)
+         {
+             //int taille=soc.bytesAvailable();
+             //qDebug()<<"send";
+             //soc.waitForReadyRead(50);
+             soc.readyRead();
+             data=soc.read(21);
+             if((data!="")&& (soc.bytesAvailable() < (int)sizeof(quint16)))
+             {
+                receive(data);
+                qDebug()<<"send";
+             }
+         }*/
+        QByteArray data;
+        soc.waitForReadyRead(100);
+        if(soc.bytesAvailable() >3)
+        {
+            data=soc.readAll();
+            qDebug() << data;
+        }
+
+    }
+}
+
+
+bool ClientControl::connecttoRobot()
 {
     soc.connectToHost(IP,port);
 
     if(!soc.waitForConnected(5000))
     {
-        MainInter->setcolorConnected("red");
+        //MainInter->setcolorConnected("red");
         connected=false;
     }
     else
     {
-        MainInter->setcolorConnected("green");
+       // MainInter->setcolorConnected("green");
         connected=true;
-        ClientSend::getInstance(&soc);
-        ClientReceive::getInstance(&soc,MainInter);
+        soc.open(QIODevice::ReadWrite);
+        processing();
     }
+    if(soc.state()==QAbstractSocket::UnconnectedState)
+    {
+        std::string s ="Not connected to"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
+        const char* msg=s.c_str();
+        QMessageBox::critical(
+              MainInter,
+              tr("Robot"),
+              tr(msg) );
+    }
+    return connected;
 }
 
 void ClientControl::setRightSpeed(unsigned char speed)
@@ -64,9 +135,120 @@ void ClientControl::setPort(int p)
 {
     port = p;
 }
-void ClientControl::stopConnectionRobot()
+
+bool ClientControl::stopConnectionRobot()
 {
     soc.close();
+    connected=false;
+    timer.stop();
+    timer2.stop();
+    if((soc.state()==QAbstractSocket::UnconnectedState) && soc.isValid())
+    {
+        std::string s ="Disconnected from"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
+        const char* msg=s.c_str();
+        QMessageBox::information(
+              MainInter,
+              tr("Robot"),
+              tr(msg) );
+    }
+    MainInter->setcolorConnected("red");
+    return connected;
+
+}
+
+void ClientControl::disconnected()
+{
+    soc.close();
+    connected=false;
+    timer.stop();
+    timer2.stop();
+    if(soc.state()==QAbstractSocket::UnconnectedState)
+    {
+        std::string s ="Disconnected from"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
+        const char* msg=s.c_str();
+        QMessageBox::information(
+              MainInter,
+              tr("Robot"),
+              tr(msg) );
+    }
+    MainInter->setcolorConnected("red");
+}
+
+void ClientControl::send()
+{
+    soc.waitForBytesWritten(10);
+    soc.write(control());
+    soc.flush();
+
+}
+
+QByteArray ClientControl::control()
+{
+    QByteArray toSend;
+    int char7=0;
+    toSend.clear();
+    toSend.clear();
+    toSend.append((char)0xff);
+    toSend.append((char)0x07);
+    toSend.append((char)getLeftSpeed());
+    toSend.append((char)0);
+    toSend.append((char)getRightSpeed());
+    toSend.append((char)0);
+    char7+=128*1;//getLeftSpeedLoop();
+    char7+=64*getLeftSpeedFlag();
+    char7+=32*1;//getRightSpeedLoop();
+    char7+=16*getRightSpeedFlag();
+    char7+=8*0;
+    toSend.append((char)char7);
+
+    quint16 crc = Crc16( &toSend, 1);
+    toSend.append((char)crc);
+    toSend.append((char)(crc>>8));
+    return toSend;
+}
+
+quint16 ClientControl::Crc16(QByteArray* byteArray, int pos){
+    unsigned char *data = (unsigned char* )byteArray->constData();
+    quint16 crc = 0xFFFF;
+    quint16 Polynome = 0xA001;
+    quint16 Parity = 0;
+    for(; pos < byteArray->length(); pos++){
+        crc ^= *(data+pos);
+        for (unsigned int CptBit = 0; CptBit <= 7 ; CptBit++){
+            Parity= crc;
+            crc >>= 1;
+            if (Parity%2 == true) crc ^= Polynome;
+        }
+    }
+    return crc;
+}
+
+void ClientControl::receive(QByteArray data)
+{
+    RobotInfo dataL;
+    RobotInfo dataR;
+    dataL.setSpeedFront((int)((data.at(1) << 8) + data.at(0)));
+    if (dataL.getSpeedFront() > 32767)
+        dataL.setSpeedFront(dataL.getSpeedFront()-65536);
+    dataL.setBatLevel(data.at(2));
+    qDebug()<<data.at(2);
+    dataL.setIR(data.at(3));
+    dataL.setIR2(data.at(4));
+    dataL.setodometry(((((long)data.at(8) << 24))+(((long)data.at(7) <<16))+(((long)data.at(6) << 8))+((long)data.at(5))));
+    dataR.setSpeedFront(((int)(data.at(10) << 8) + data.at(9)));
+    if (dataR.getSpeedFront() > 32767)
+        dataR.setSpeedFront(dataR.getSpeedFront()-65536);
+
+    qDebug()<<(dataR.getSpeedFront()-65536);
+    dataR.setBatLevel(0);
+    dataR.setIR(data.at(11));
+    dataR.setIR2(data.at(12));
+    dataR.setodometry(((((long)data.at(16)<< 24))+(((long)data.at(15) <<16))+(((long)data.at(14) << 8))+((long)data.at(13))));
+    dataL.setCurrent(data.at(17));
+    dataR.setCurrent(data.at(17));
+    dataL.setVersion(data.at(18));
+    dataR.setVersion(data.at(18));
+    MainInter->majInterface(dataR,dataL);
 }
 
 ClientControl::~ClientControl()

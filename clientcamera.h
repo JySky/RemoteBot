@@ -13,7 +13,6 @@ class ClientCamera
     private:
         QString IP;
         int port;
-        QTcpSocket soc;
         Interface* MainInter;
         static ClientCamera* m_instance;
         ClientCamera(Interface *inter);
@@ -32,7 +31,8 @@ class ClientCamera
         void setPort(int p);
         QString getIp(){return IP;}
         int getPort(){return port;}
-        void connecttoCamera();
+        bool connecttoCamera();
+        void stopConnectionCamera();
 };
 
 #endif // CLIENTCAMERA_H

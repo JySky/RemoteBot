@@ -9,5 +9,12 @@
         <file>image/arrowLeftPressed.png</file>
         <file>image/arrowRightPressed.png</file>
         <file>image/arrowUpPressed.png</file>
+        <file>image/arrowDotCamera.png</file>
+        <file>image/arrowDotRobot.png</file>
+        <file>image/speedIc.png</file>
+        <file>image/battery.png</file>
+        <file>image/ping.png</file>
+        <file>image/nosignal.png</file>
+        <file>image/remotebot.png</file>
     </qresource>
 </RCC>
