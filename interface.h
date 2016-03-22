@@ -67,7 +67,9 @@ class Interface : public QMainWindow
             void on_robotDown_released();
             void on_robotLeft_clicked();
             void on_robotLeft_released();
-        signals:
+            void on_actionQuitter_triggered();
+
+signals:
             void newvalue(int value);
         public:
             Ui::Interface *getUi(){return ui;}

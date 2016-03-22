@@ -17,20 +17,12 @@ ClientControl::ClientControl(Interface *inter)
     rightSpeedLoop=0;
     connected=false;
     connect(&soc, SIGNAL(disconnected()),this, SLOT(disconnected()));
-
-
-    //connect(soc, SIGNAL(connected()),this, SLOT(connected()));
-
-    //connect(soc, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64)));
-    //QObject::connect(soc, SIGNAL(readyRead()),this, SLOT(dataRead()));
-
 }
 
 void ClientControl::processing()
 {
     timer.setInterval(100);
     timer2.setInterval(100);
-    //connect(&soc, SIGNAL(readyRead()),this, SLOT(dataRead()));
     connect(&timer, SIGNAL (timeout()), this, SLOT (dataWrite()));
     connect(&timer2, SIGNAL (timeout()), this, SLOT (dataRead()));
     timer.start();
@@ -49,32 +41,14 @@ void ClientControl::dataRead()
 {
     if(soc.open(QIODevice::ReadWrite))
     {
-        /*//qDebug()<<"send";
-         //soc.waitForBytesWritten();
-         soc.waitForReadyRead(50);
-         QByteArray data;
-         data.clear();
-         if(soc.canReadLine())//((soc.bytesAvailable())>20)
-         {
-             //int taille=soc.bytesAvailable();
-             //qDebug()<<"send";
-             //soc.waitForReadyRead(50);
-             soc.readyRead();
-             data=soc.read(21);
-             if((data!="")&& (soc.bytesAvailable() < (int)sizeof(quint16)))
-             {
-                receive(data);
-                qDebug()<<"send";
-             }
-         }*/
         QByteArray data;
         soc.waitForReadyRead(100);
-        if(soc.bytesAvailable() >3)
+        if(soc.bytesAvailable()>=21)
         {
             data=soc.readAll();
-            qDebug() << data;
+            receive(data);
+            //qDebug() << data<<endl;
         }
-
     }
 }
 
@@ -85,12 +59,10 @@ bool ClientControl::connecttoRobot()
 
     if(!soc.waitForConnected(5000))
     {
-        //MainInter->setcolorConnected("red");
         connected=false;
     }
     else
     {
-       // MainInter->setcolorConnected("green");
         connected=true;
         soc.open(QIODevice::ReadWrite);
         processing();
@@ -231,15 +203,12 @@ void ClientControl::receive(QByteArray data)
     if (dataL.getSpeedFront() > 32767)
         dataL.setSpeedFront(dataL.getSpeedFront()-65536);
     dataL.setBatLevel(data.at(2));
-    qDebug()<<data.at(2);
     dataL.setIR(data.at(3));
     dataL.setIR2(data.at(4));
     dataL.setodometry(((((long)data.at(8) << 24))+(((long)data.at(7) <<16))+(((long)data.at(6) << 8))+((long)data.at(5))));
     dataR.setSpeedFront(((int)(data.at(10) << 8) + data.at(9)));
     if (dataR.getSpeedFront() > 32767)
         dataR.setSpeedFront(dataR.getSpeedFront()-65536);
-
-    qDebug()<<(dataR.getSpeedFront()-65536);
     dataR.setBatLevel(0);
     dataR.setIR(data.at(11));
     dataR.setIR2(data.at(12));

@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/image">
-        <file>image/arrowDot.png</file>
         <file>image/arrowDown.png</file>
         <file>image/arrowLeft.png</file>
         <file>image/arrowRight.png</file>
@@ -15,6 +14,8 @@
         <file>image/battery.png</file>
         <file>image/ping.png</file>
         <file>image/nosignal.png</file>
-        <file>image/remotebot.png</file>
+        <file>image/connected.png</file>
+        <file>image/disconnected.png</file>
+        <file>image/connectwarning.png</file>
     </qresource>
 </RCC>

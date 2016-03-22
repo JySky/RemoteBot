@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>620</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>480</width>
-    <height>620</height>
+    <height>600</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>480</width>
-    <height>620</height>
+    <height>600</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -91,14 +91,17 @@
    <widget class="QLabel" name="frame">
     <property name="geometry">
      <rect>
-      <x>36</x>
+      <x>46</x>
       <y>60</y>
-      <width>411</width>
+      <width>391</width>
       <height>291</height>
      </rect>
     </property>
     <property name="text">
      <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/nosignal.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -149,7 +152,7 @@
     <property name="geometry">
      <rect>
       <x>230</x>
-      <y>430</y>
+      <y>410</y>
       <width>31</width>
       <height>71</height>
      </rect>
@@ -198,139 +201,6 @@
      <enum>QProgressBar::TopToBottom</enum>
     </property>
    </widget>
-   <widget class="QLCDNumber" name="displayPing">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>10</y>
-      <width>64</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="palette">
-     <palette>
-      <active>
-       <colorrole role="Text">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </colorrole>
-      </active>
-      <inactive>
-       <colorrole role="Text">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </colorrole>
-      </inactive>
-      <disabled>
-       <colorrole role="Text">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>120</red>
-          <green>120</green>
-          <blue>120</blue>
-         </color>
-        </brush>
-       </colorrole>
-      </disabled>
-     </palette>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="lineWidth">
-     <number>6</number>
-    </property>
-    <property name="midLineWidth">
-     <number>0</number>
-    </property>
-    <property name="smallDecimalPoint">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QLCDNumber" name="displaySpeed">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>400</y>
-      <width>64</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="palette">
-     <palette>
-      <active>
-       <colorrole role="Text">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </colorrole>
-      </active>
-      <inactive>
-       <colorrole role="Text">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </colorrole>
-      </inactive>
-      <disabled>
-       <colorrole role="Text">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>120</red>
-          <green>120</green>
-          <blue>120</blue>
-         </color>
-        </brush>
-       </colorrole>
-      </disabled>
-     </palette>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="lineWidth">
-     <number>2</number>
-    </property>
-    <property name="midLineWidth">
-     <number>0</number>
-    </property>
-    <property name="smallDecimalPoint">
-     <bool>false</bool>
-    </property>
-    <property name="digitCount">
-     <number>3</number>
-    </property>
-    <property name="mode">
-     <enum>QLCDNumber::Dec</enum>
-    </property>
-    <property name="segmentStyle">
-     <enum>QLCDNumber::Filled</enum>
-    </property>
-   </widget>
    <widget class="Line" name="line">
     <property name="geometry">
      <rect>
@@ -361,7 +231,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>540</y>
+      <y>520</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -370,89 +240,11 @@
      <string>Start</string>
     </property>
    </widget>
-   <widget class="QLCDNumber" name="displaySpeedSet">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>510</y>
-      <width>64</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="lineWidth">
-     <number>6</number>
-    </property>
-    <property name="midLineWidth">
-     <number>0</number>
-    </property>
-    <property name="smallDecimalPoint">
-     <bool>false</bool>
-    </property>
-    <property name="digitCount">
-     <number>4</number>
-    </property>
-    <property name="mode">
-     <enum>QLCDNumber::Dec</enum>
-    </property>
-    <property name="segmentStyle">
-     <enum>QLCDNumber::Filled</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="connected">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Box</enum>
-    </property>
-    <property name="lineWidth">
-     <number>2</number>
-    </property>
-    <property name="text">
-     <string>Connection</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="colorConnected">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>10</y>
-      <width>21</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QLabel#colorConnected { background-color : red; }</string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Panel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <property name="lineWidth">
-     <number>3</number>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QPushButton" name="robotStop">
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>540</y>
+      <y>520</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -503,7 +295,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>410</y>
+      <y>390</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -522,7 +314,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>430</y>
+      <y>410</y>
       <width>61</width>
       <height>61</height>
      </rect>
@@ -541,7 +333,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>440</y>
+      <y>420</y>
       <width>21</width>
       <height>41</height>
      </rect>
@@ -560,7 +352,7 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>440</y>
+      <y>420</y>
       <width>21</width>
       <height>41</height>
      </rect>
@@ -588,7 +380,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>490</y>
+      <y>470</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -607,7 +399,7 @@
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>440</y>
+      <y>420</y>
       <width>21</width>
       <height>41</height>
      </rect>
@@ -626,7 +418,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>430</y>
+      <y>410</y>
       <width>61</width>
       <height>61</height>
      </rect>
@@ -645,7 +437,7 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>410</y>
+      <y>390</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -667,7 +459,7 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>490</y>
+      <y>470</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -695,7 +487,7 @@
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>440</y>
+      <y>420</y>
       <width>21</width>
       <height>41</height>
      </rect>
@@ -720,7 +512,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>400</y>
+      <y>380</y>
       <width>21</width>
       <height>21</height>
      </rect>
@@ -735,31 +527,148 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="remotebot">
+   <widget class="QLabel" name="displaySpeedSet">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>370</y>
-      <width>151</width>
-      <height>16</height>
+      <x>220</x>
+      <y>490</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>LcdD</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="displaySpeed">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>380</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>LcdD</family>
+      <pointsize>14</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>10</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>LcdD</family>
+      <pointsize>14</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>0</number>
+    </property>
+    <property name="indent">
+     <number>6</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="colorConnected">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>10</y>
+      <width>41</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
      <string/>
     </property>
-    <property name="textFormat">
-     <enum>Qt::PlainText</enum>
-    </property>
     <property name="pixmap">
-     <pixmap resource="remotebot.qrc">:/image/image/remotebot.png</pixmap>
+     <pixmap resource="remotebot.qrc">:/image/image/disconnected.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
     </property>
-    <property name="wordWrap">
-     <bool>true</bool>
+   </widget>
+   <widget class="QWebView" name="webView">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>60</y>
+      <width>381</width>
+      <height>291</height>
+     </rect>
+    </property>
+    <property name="url">
+     <url>
+      <string>about:blank</string>
+     </url>
     </property>
    </widget>
+   <zorder>webView</zorder>
+   <zorder>pbSpeedLF</zorder>
+   <zorder>pbSpeedLR</zorder>
+   <zorder>frame</zorder>
+   <zorder>pbSpeedRF</zorder>
+   <zorder>pbSpeedRR</zorder>
+   <zorder>sliderSpeed</zorder>
+   <zorder>batteryLevel</zorder>
+   <zorder>line</zorder>
+   <zorder>line_2</zorder>
+   <zorder>robotStart</zorder>
+   <zorder>robotStop</zorder>
+   <zorder>pingLabel</zorder>
+   <zorder>batteryLabel</zorder>
+   <zorder>cameraUp</zorder>
+   <zorder>dotCamera</zorder>
+   <zorder>cameraRight</zorder>
+   <zorder>cameraLeft</zorder>
+   <zorder>cameraDown</zorder>
+   <zorder>robotLeft</zorder>
+   <zorder>dotRobot</zorder>
+   <zorder>robotUp</zorder>
+   <zorder>robotDown</zorder>
+   <zorder>robotRight</zorder>
+   <zorder>camera_2</zorder>
+   <zorder>displaySpeedSet</zorder>
+   <zorder>displaySpeed</zorder>
+   <zorder>label</zorder>
+   <zorder>colorConnected</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -783,8 +692,17 @@
     </widget>
     <addaction name="actionPort_et_IP"/>
     <addaction name="menuOption"/>
+    <addaction name="actionQuitter"/>
+   </widget>
+   <widget class="QMenu" name="menuAide">
+    <property name="title">
+     <string>Aide</string>
+    </property>
+    <addaction name="actionTutoriel"/>
+    <addaction name="actionA_propos"/>
    </widget>
    <addaction name="menuConfigurer"/>
+   <addaction name="menuAide"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionPort_et_IP">
@@ -802,9 +720,29 @@
     <string>Activer Manette</string>
    </property>
   </action>
+  <action name="actionTutoriel">
+   <property name="text">
+    <string>Tutoriel</string>
+   </property>
+  </action>
+  <action name="actionA_propos">
+   <property name="text">
+    <string>A propos</string>
+   </property>
+  </action>
+  <action name="actionQuitter">
+   <property name="text">
+    <string>Quitter</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
+  <customwidget>
+   <class>QWebView</class>
+   <extends>QWidget</extends>
+   <header>QtWebKitWidgets/QWebView</header>
+  </customwidget>
   <customwidget>
    <class>ClickableLabel</class>
    <extends>QLabel</extends>
@@ -819,15 +757,15 @@
    <sender>sliderSpeed</sender>
    <signal>valueChanged(int)</signal>
    <receiver>displaySpeedSet</receiver>
-   <slot>display(int)</slot>
+   <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
      <y>486</y>
     </hint>
     <hint type="destinationlabel">
-     <x>313</x>
-     <y>421</y>
+     <x>245</x>
+     <y>541</y>
     </hint>
    </hints>
   </connection>
