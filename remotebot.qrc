@@ -17,5 +17,8 @@
         <file>image/connected.png</file>
         <file>image/disconnected.png</file>
         <file>image/connectwarning.png</file>
+        <file>image/RemoteBot.ico</file>
+        <file>image/remotebot.png</file>
+        <file>image/arrowDotCameraPressed.png</file>
     </qresource>
 </RCC>

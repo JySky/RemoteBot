@@ -151,10 +151,10 @@
    <widget class="QSlider" name="sliderSpeed">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>260</x>
       <y>410</y>
       <width>31</width>
-      <height>71</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="maximum">
@@ -170,7 +170,7 @@
      <enum>Qt::Vertical</enum>
     </property>
     <property name="tickPosition">
-     <enum>QSlider::TicksBothSides</enum>
+     <enum>QSlider::TicksBelow</enum>
     </property>
     <property name="tickInterval">
      <number>10</number>
@@ -231,7 +231,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>520</y>
+      <y>530</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -244,7 +244,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>520</y>
+      <y>530</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -310,7 +310,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="dotCamera">
+   <widget class="ClickableLabel" name="dotCamera">
     <property name="geometry">
      <rect>
       <x>70</x>
@@ -508,11 +508,11 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="camera_2">
+   <widget class="QLabel" name="vitesseLogo">
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>380</y>
+      <y>370</y>
       <width>21</width>
       <height>21</height>
      </rect>
@@ -530,8 +530,8 @@
    <widget class="QLabel" name="displaySpeedSet">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>490</y>
+      <x>260</x>
+      <y>500</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -556,7 +556,7 @@
     <property name="geometry">
      <rect>
       <x>230</x>
-      <y>380</y>
+      <y>370</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -640,6 +640,124 @@
      </url>
     </property>
    </widget>
+   <widget class="QLabel" name="logo">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/RemoteBot.ico</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="logo2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>540</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/remotebot.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QSlider" name="sliderSpeedCam">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>410</y>
+      <width>31</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+    <property name="sliderPosition">
+     <number>0</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+    <property name="invertedAppearance">
+     <bool>false</bool>
+    </property>
+    <property name="invertedControls">
+     <bool>false</bool>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksAbove</enum>
+    </property>
+    <property name="tickInterval">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="displaySpeedSetCam">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>500</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>LcdD</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="Line" name="line_3">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>400</y>
+      <width>20</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
    <zorder>webView</zorder>
    <zorder>pbSpeedLF</zorder>
    <zorder>pbSpeedLR</zorder>
@@ -664,11 +782,16 @@
    <zorder>robotUp</zorder>
    <zorder>robotDown</zorder>
    <zorder>robotRight</zorder>
-   <zorder>camera_2</zorder>
+   <zorder>vitesseLogo</zorder>
    <zorder>displaySpeedSet</zorder>
    <zorder>displaySpeed</zorder>
    <zorder>label</zorder>
    <zorder>colorConnected</zorder>
+   <zorder>logo</zorder>
+   <zorder>logo2</zorder>
+   <zorder>sliderSpeedCam</zorder>
+   <zorder>displaySpeedSetCam</zorder>
+   <zorder>line_3</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -685,13 +808,15 @@
     </property>
     <widget class="QMenu" name="menuOption">
      <property name="title">
-      <string>Option</string>
+      <string>Options</string>
      </property>
      <addaction name="actionActiver_Traitement_Image"/>
      <addaction name="actionActiver_Manette"/>
+     <addaction name="actionCamera_Automatique"/>
     </widget>
     <addaction name="actionPort_et_IP"/>
     <addaction name="menuOption"/>
+    <addaction name="separator"/>
     <addaction name="actionQuitter"/>
    </widget>
    <widget class="QMenu" name="menuAide">
@@ -711,11 +836,17 @@
    </property>
   </action>
   <action name="actionActiver_Traitement_Image">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Activer Traitement Image</string>
    </property>
   </action>
   <action name="actionActiver_Manette">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Activer Manette</string>
    </property>
@@ -733,6 +864,19 @@
   <action name="actionQuitter">
    <property name="text">
     <string>Quitter</string>
+   </property>
+  </action>
+  <action name="actionCamera_Automatique">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Activer Camera Automatique</string>
+   </property>
+  </action>
+  <action name="actionVitesse_camera">
+   <property name="text">
+    <string>Vitesse camera</string>
    </property>
   </action>
  </widget>
@@ -766,6 +910,22 @@
     <hint type="destinationlabel">
      <x>245</x>
      <y>541</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderSpeedCam</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>displaySpeedSetCam</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>461</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>35</x>
+     <y>531</y>
     </hint>
    </hints>
   </connection>

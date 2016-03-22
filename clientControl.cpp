@@ -27,7 +27,6 @@ void ClientControl::processing()
     connect(&timer2, SIGNAL (timeout()), this, SLOT (dataRead()));
     timer.start();
     timer2.start();
-
 }
 
 void ClientControl::dataWrite()

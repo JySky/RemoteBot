@@ -16,6 +16,9 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interfac
     Qpressed=false;
     Spressed=false;
     Dpressed=false;
+    camAuto=false;
+    imgProc=false;
+    controllerOn=false;
 }
 
 void Interface::keyPressEvent(QKeyEvent *event)
@@ -103,7 +106,7 @@ void Interface::on_robotStart_clicked()
     bool resRobot=false;
     bool resCam=false;
     resRobot=Clientcont->connecttoRobot();
-    //resCam=Clientcam->connecttoCamera();
+    resCam=Clientcam->connecttoCamera();
     /*if(Clientcam->getSocket()->state()==QAbstractSocket::UnconnectedState)
     {
         std::string s ="Not connected to"+Clientcam->getIp().toStdString()+"/"+QString::number(Clientcam->getPort()).toStdString();
@@ -138,7 +141,7 @@ void Interface::on_robotStart_clicked()
 void Interface::on_robotStop_clicked()
 {
     Clientcont->stopConnectionRobot();
-    //Clientcam->stopConnectionCamera();
+    Clientcam->stopConnectionCamera();
     this->setcolorConnected("red");
 }
 
@@ -202,11 +205,25 @@ void Interface::setImage(QImage img)
      ui->frame->setPixmap(QPixmap::fromImage(img));
 }
 
+void Interface::setImage(QString img)
+{
+     ui->frame->setPixmap(img);
+}
+void Interface::setQWebView(QString link)
+{
+    ui->webView->setUrl(link);
+}
+int Interface::getSliderCam()
+{
+    return ui->sliderSpeedCam->value();
+}
+
 //************** CONTROLE CAMERA **************//
 void Interface::ControlCam()
 {
     if(Zpressed && !Qpressed && !Spressed && !Dpressed)
     { // haut
+        Clientcam->moveCam(1);
         QPixmap mypix (":/image/image/arrowUpPressed.png");
         ui->cameraUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeft.png");
@@ -214,14 +231,11 @@ void Interface::ControlCam()
         QPixmap mypix2 (":/image/image/arrowRight.png");
         ui->cameraRight->setPixmap(mypix2);
         QPixmap mypix3 (":/image/image/arrowDown.png");
-        ui->cameraDown->setPixmap(mypix3);
-        req.setUrl((QUrl(QString("http://"+Clientcam->getIp()+":"+Clientcam->getPort()+"/?action=command&dest=0&plugin=0&id=10094853&group=1&value=-200"))));
-        mgr.get(req);
+        ui->cameraDown->setPixmap(mypix3); 
     }
     else if(!Zpressed && !Qpressed && Spressed && !Dpressed)
     { //bas
-        req.setUrl((QUrl(QString("http://"+Clientcam->getIp()+":"+Clientcam->getPort()+"/?action=command&dest=0&plugin=0&id=10094853&group=1&value=200"))));
-        mgr.get(req);
+         Clientcam->moveCam(2);
         QPixmap mypix (":/image/image/arrowUp.png");
         ui->cameraUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeft.png");
@@ -233,8 +247,7 @@ void Interface::ControlCam()
     }
     else if(!Zpressed && Qpressed && !Spressed && !Dpressed)
     { // gauche
-        req.setUrl((QUrl(QString("http://"+Clientcam->getIp()+":"+Clientcam->getPort()+"/?action=command&dest=0&plugin=0&id=10094852&group=1&value=200"))));
-        mgr.get(req);
+        Clientcam->moveCam(3);
         QPixmap mypix (":/image/image/arrowUp.png");
         ui->cameraUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeftPressed.png");
@@ -246,8 +259,7 @@ void Interface::ControlCam()
     }
     else if(!Zpressed && !Qpressed && !Spressed && Dpressed)
     { // droite
-        req.setUrl((QUrl(QString("http://"+Clientcam->getIp()+":"+Clientcam->getPort()+"/?action=command&dest=0&plugin=0&id=10094852&group=1&value=-200"))));
-        mgr.get(req);
+        Clientcam->moveCam(4);
         QPixmap mypix (":/image/image/arrowUp.png");
         ui->cameraUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeft.png");
@@ -259,6 +271,7 @@ void Interface::ControlCam()
     }
     else if(Zpressed && Qpressed && !Spressed && !Dpressed)
     { // haut gauche
+        Clientcam->moveCam(6);
         QPixmap mypix (":/image/image/arrowUpPressed.png");
         ui->cameraUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeftPressed.png");
@@ -270,6 +283,7 @@ void Interface::ControlCam()
     }
     else if(Zpressed && !Qpressed && !Spressed && Dpressed)
     { // haut droite
+        Clientcam->moveCam(5);
         QPixmap mypix (":/image/image/arrowUpPressed.png");
         ui->cameraUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeft.png");
@@ -281,6 +295,7 @@ void Interface::ControlCam()
     }
     else if(!Zpressed && Qpressed && Spressed && !Dpressed)
     { // arrière gauche
+        Clientcam->moveCam(7);
         QPixmap mypix (":/image/image/arrowUp.png");
         ui->cameraUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeftPressed.png");
@@ -292,6 +307,7 @@ void Interface::ControlCam()
     }
     else if(!Zpressed && !Qpressed && Spressed && Dpressed)
     { // arrière droit
+        Clientcam->moveCam(8);
         QPixmap mypix (":/image/image/arrowUp.png");
         ui->cameraUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeft.png");
@@ -312,6 +328,20 @@ void Interface::ControlCam()
         QPixmap mypix3 (":/image/image/arrowDown.png");
         ui->cameraDown->setPixmap(mypix3);
     }
+}
+
+void Interface::on_dotCamera_clicked()
+{
+    Clientcam->moveCam(9);
+    QPixmap mypix (":/image/image/arrowDotCameraPressed.png");
+    ui->dotCamera->setPixmap(mypix);
+}
+
+void Interface::on_dotCamera_released()
+{
+    Clientcam->moveCam(9);
+    QPixmap mypix (":/image/image/arrowDotCamera.png");
+    ui->dotCamera->setPixmap(mypix);
 }
 
 void Interface::on_cameraLeft_clicked()
@@ -554,4 +584,39 @@ void Interface::on_robotLeft_released()
 void Interface::on_actionQuitter_triggered()
 {
     this->close();
+}
+
+
+void Interface::on_actionActiver_Manette_changed()
+{
+    if(imgProc)
+    {
+        controllerOn=false;
+    }else
+    {
+        controllerOn=true;
+    }
+}
+
+void Interface::on_actionActiver_Traitement_Image_changed()
+{
+    if(imgProc)
+    {
+        imgProc=false;
+    }else
+    {
+        imgProc=true;
+    }
+}
+
+void Interface::on_actionCamera_Automatique_changed()
+{
+    if(imgProc)
+    {
+        camAuto=false;
+    }else
+    {
+        camAuto=true;
+    }
+    Clientcam->setCamAuto(camAuto);
 }
