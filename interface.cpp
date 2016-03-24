@@ -100,31 +100,28 @@ void Interface::keyReleaseEvent(QKeyEvent *event)
     ControlDirection();
     ControlCam();
 }
-
-void Interface::on_robotStart_clicked()
+void Interface::camDisconnected()
 {
-    bool resRobot=false;
-    bool resCam=false;
-    resRobot=Clientcont->connecttoRobot();
-    resCam=Clientcam->connecttoCamera();
-    /*if(Clientcam->getSocket()->state()==QAbstractSocket::UnconnectedState)
-    {
-        std::string s ="Not connected to"+Clientcam->getIp().toStdString()+"/"+QString::number(Clientcam->getPort()).toStdString();
-        const char* msg=s.c_str();
-        QMessageBox::critical(
-              this,
-              tr("Camera"),
-              tr(msg) );
-        QPixmap mypix (":/image/image/nosignal.png");
-        ui->frame->setPixmap(mypix);
-    }*/
+    camconnected=false;
+    majConnectedState();
+}
 
-    if(resRobot&&resCam)
+void Interface::robotDisconnected()
+{
+    robotconnected=false;
+    majConnectedState();
+}
+
+void Interface::majConnectedState()
+{
+
+    if(robotconnected&&camconnected)
     {
         QPixmap mypix (":/image/image/connected.png");
         ui->colorConnected->setPixmap(mypix);
+
     }
-    else if((resRobot&&!resCam)||(!resRobot&&resCam))
+    else if((robotconnected&&!camconnected)||(!robotconnected&&camconnected))
     {
 
         QPixmap mypix (":/image/image/connectwarning.png");
@@ -135,7 +132,13 @@ void Interface::on_robotStart_clicked()
         QPixmap mypix (":/image/image/disconnected.png");
         ui->colorConnected->setPixmap(mypix);
     }
-    //ui->webView->load(QUrl("http://192.168.1.106:8080/javascript_simple.html"));
+}
+
+void Interface::on_robotStart_clicked()
+{
+    robotconnected=Clientcont->connecttoRobot();
+    camconnected=Clientcam->connecttoCamera();
+    majConnectedState();
 }
 
 void Interface::on_robotStop_clicked()
@@ -178,7 +181,7 @@ void Interface::on_actionPort_et_IP_triggered()
 
 void Interface::majInterface(RobotInfo dataR, RobotInfo dataL)
 {
-    ui->batteryLevel->setValue((int)(dataL.getBatLevel()/2.55));
+    ui->batteryLevel->setValue((int)(dataL.getBatLevel()/(-2.55)));
    /* if(dataR.SpeedFront>=0)
     {
         ui->pbSpeedRF->setValue(dataR.SpeedFront);
@@ -428,8 +431,8 @@ void Interface::ControlDirection()
     }
     else if(Jpressed && !Ipressed && !Kpressed && !Lpressed)
     { // gauche
-        Clientcont->setLeftSpeedFlag(1);
-        Clientcont->setRightSpeedFlag(0);
+        Clientcont->setLeftSpeedFlag(0);
+        Clientcont->setRightSpeedFlag(1);
         Clientcont->setLeftSpeed((int)((ui->displaySpeedSet->text().toInt())*2.4));
         Clientcont->setRightSpeed((int)((ui->displaySpeedSet->text().toInt())*2.4));
         QPixmap mypix (":/image/image/arrowUp.png");
@@ -443,8 +446,8 @@ void Interface::ControlDirection()
     }
     else if(Lpressed && !Ipressed && !Jpressed && !Kpressed)
     { // droite
-        Clientcont->setLeftSpeedFlag(0);
-        Clientcont->setRightSpeedFlag(1);
+        Clientcont->setLeftSpeedFlag(1);
+        Clientcont->setRightSpeedFlag(0);
         Clientcont->setLeftSpeed((int)((ui->displaySpeedSet->text().toInt())*2.4));
         Clientcont->setRightSpeed((int)((ui->displaySpeedSet->text().toInt())*2.4));
         QPixmap mypix (":/image/image/arrowUp.png");
@@ -460,7 +463,7 @@ void Interface::ControlDirection()
     { // avant gauche
         Clientcont->setLeftSpeedFlag(1);
         Clientcont->setRightSpeedFlag(1);
-        Clientcont->setLeftSpeed((int)((ui->displaySpeedSet->text().toInt())*1.4));
+        Clientcont->setLeftSpeed((int)((ui->displaySpeedSet->text().toInt())*0.7));
         Clientcont->setRightSpeed((int)((ui->displaySpeedSet->text().toInt())*2.4));
         QPixmap mypix (":/image/image/arrowUpPressed.png");
         ui->robotUp->setPixmap(mypix);
@@ -476,7 +479,7 @@ void Interface::ControlDirection()
         Clientcont->setLeftSpeedFlag(1);
         Clientcont->setRightSpeedFlag(1);
         Clientcont->setLeftSpeed((int)((ui->displaySpeedSet->text().toInt())*2.4));
-        Clientcont->setRightSpeed((int)((ui->displaySpeedSet->text().toInt())*1.4));
+        Clientcont->setRightSpeed((int)((ui->displaySpeedSet->text().toInt())*0.7));
         QPixmap mypix (":/image/image/arrowUpPressed.png");
         ui->robotUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeft.png");
@@ -488,9 +491,9 @@ void Interface::ControlDirection()
     }
     else if(Kpressed && Jpressed && !Ipressed && !Lpressed)
     { // arrière gauche
-        Clientcont->setLeftSpeedFlag(1);
-        Clientcont->setRightSpeedFlag(1);
-        Clientcont->setLeftSpeed((int)((ui->displaySpeedSet->text().toInt())*1.4));
+        Clientcont->setLeftSpeedFlag(0);
+        Clientcont->setRightSpeedFlag(0);
+        Clientcont->setLeftSpeed((int)((ui->displaySpeedSet->text().toInt())*0.7));
         Clientcont->setRightSpeed((int)((ui->displaySpeedSet->text().toInt())*2.4));
         QPixmap mypix (":/image/image/arrowUp.png");
         ui->robotUp->setPixmap(mypix);
@@ -503,10 +506,10 @@ void Interface::ControlDirection()
     }
     else if(Kpressed && Lpressed && !Ipressed && !Jpressed)
     { // arrière droit
-        Clientcont->setLeftSpeedFlag(1);
-        Clientcont->setRightSpeedFlag(1);
+        Clientcont->setLeftSpeedFlag(0);
+        Clientcont->setRightSpeedFlag(0);
         Clientcont->setLeftSpeed((int)((ui->displaySpeedSet->text().toInt())*2.4));
-        Clientcont->setRightSpeed((int)((ui->displaySpeedSet->text().toInt())*1.4));
+        Clientcont->setRightSpeed((int)((ui->displaySpeedSet->text().toInt())*0.7));
         QPixmap mypix (":/image/image/arrowUp.png");
         ui->robotUp->setPixmap(mypix);
         QPixmap mypix1 (":/image/image/arrowLeft.png");

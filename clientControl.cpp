@@ -1,4 +1,5 @@
 #include "clientcontrol.h"
+#include <QDebug>
 
 ClientControl* ClientControl::m_instance = NULL;
 
@@ -17,16 +18,23 @@ ClientControl::ClientControl(Interface *inter)
     rightSpeedLoop=0;
     connected=false;
     connect(&soc, SIGNAL(disconnected()),this, SLOT(disconnected()));
+    connect(&soc, SIGNAL(disconnected()),MainInter, SLOT(robotDisconnected()));
 }
 
 void ClientControl::processing()
 {
-    timer.setInterval(100);
+    timer.setInterval(50);
     timer2.setInterval(100);
     connect(&timer, SIGNAL (timeout()), this, SLOT (dataWrite()));
     connect(&timer2, SIGNAL (timeout()), this, SLOT (dataRead()));
     timer.start();
     timer2.start();
+}
+
+void ClientControl::stopProcessing()
+{
+    timer.stop();
+    timer2.stop();
 }
 
 void ClientControl::dataWrite()
@@ -44,13 +52,11 @@ void ClientControl::dataRead()
         soc.waitForReadyRead(100);
         if(soc.bytesAvailable()>=21)
         {
-            data=soc.readAll();
+            data=soc.read(21);
             receive(data);
-            //qDebug() << data<<endl;
         }
     }
 }
-
 
 bool ClientControl::connecttoRobot()
 {
@@ -111,8 +117,7 @@ bool ClientControl::stopConnectionRobot()
 {
     soc.close();
     connected=false;
-    timer.stop();
-    timer2.stop();
+    stopProcessing();
     if((soc.state()==QAbstractSocket::UnconnectedState) && soc.isValid())
     {
         std::string s ="Disconnected from"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
@@ -150,7 +155,6 @@ void ClientControl::send()
     soc.waitForBytesWritten(10);
     soc.write(control());
     soc.flush();
-
 }
 
 QByteArray ClientControl::control()
@@ -165,9 +169,9 @@ QByteArray ClientControl::control()
     toSend.append((char)0);
     toSend.append((char)getRightSpeed());
     toSend.append((char)0);
-    char7+=128*1;//getLeftSpeedLoop();
+    char7+=128*0;//getLeftSpeedLoop();
     char7+=64*getLeftSpeedFlag();
-    char7+=32*1;//getRightSpeedLoop();
+    char7+=32*0;//getRightSpeedLoop();
     char7+=16*getRightSpeedFlag();
     char7+=8*0;
     toSend.append((char)char7);
@@ -202,6 +206,7 @@ void ClientControl::receive(QByteArray data)
     if (dataL.getSpeedFront() > 32767)
         dataL.setSpeedFront(dataL.getSpeedFront()-65536);
     dataL.setBatLevel(data.at(2));
+    qDebug()<<((int)data.at(2));
     dataL.setIR(data.at(3));
     dataL.setIR2(data.at(4));
     dataL.setodometry(((((long)data.at(8) << 24))+(((long)data.at(7) <<16))+(((long)data.at(6) << 8))+((long)data.at(5))));
@@ -216,6 +221,7 @@ void ClientControl::receive(QByteArray data)
     dataR.setCurrent(data.at(17));
     dataL.setVersion(data.at(18));
     dataR.setVersion(data.at(18));
+    qDebug()<<data;
     MainInter->majInterface(dataR,dataL);
 }
 

@@ -42,8 +42,11 @@ class Interface : public QMainWindow
             bool camAuto;
             bool imgProc;
             bool controllerOn;
+            bool camconnected;
+            bool robotconnected;
             void ControlDirection();
             void ControlCam();
+            void majConnectedState();
 
         protected:
             void keyPressEvent(QKeyEvent *event);
@@ -89,6 +92,10 @@ class Interface : public QMainWindow
             void setImage(QImage img);
             void setImage(QString img);
             int getSliderCam();
+
+        public slots :
+            void camDisconnected();
+            void robotDisconnected();
 };
 
 #endif // INTERFACE_H

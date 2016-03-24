@@ -16,6 +16,12 @@
 
 class Interface;
 
+struct Poscam
+{
+    int x;
+    int y;
+};
+
 class ClientCamera: public QObject
 {
     Q_OBJECT
@@ -27,20 +33,29 @@ class ClientCamera: public QObject
         bool connected;
         bool camAuto;
         static const int camV;
+        static const int camMaxUp;
+        static const int camMaxDown;
+        static const int camMaxLeft;
+        static const int camMaxRight;
+        static const int  setVitesseEnable;
+        static const int  setVitesseDisable;
         QString left;
         QString right;
         QString down;
         QString up;
         QString reset;
         QString url;
-        QNetworkAccessManager* mgr;
-        QNetworkRequest* req;
+        Poscam* position;
         Interface* MainInter;
         void initCam();
         void setVitesseVar();
         static ClientCamera* m_instance;
         ClientCamera(Interface *inter);
         ~ClientCamera();
+        void urlAccess(QString url);
+
+    private slots:
+        void disconnected();
 
     public:
         static ClientCamera* getInstance(Interface* inter)

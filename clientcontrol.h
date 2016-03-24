@@ -38,6 +38,7 @@ class ClientControl: public QObject
         quint16 Crc16(QByteArray* byteArray, int pos);
         void send();
         void processing();
+        void stopProcessing();
         ~ClientControl();
 
     private slots:
