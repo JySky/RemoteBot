@@ -23,7 +23,7 @@ class ClientControl: public QObject
         int port;
         QTcpSocket soc;
         QTimer timer,timer2;
-        bool connected;
+        bool connectedState;
         unsigned char rightSpeed;
         unsigned char leftSpeed;
         unsigned char leftSpeedLoop;
@@ -39,11 +39,18 @@ class ClientControl: public QObject
         void send();
         void processing();
         void stopProcessing();
+        void receive();
+        void init();
         ~ClientControl();
 
     private slots:
         void dataWrite();
         void dataRead();
+        void disconnect();
+        void connect();
+
+    signals:
+        void connected();
         void disconnected();
 
     public:
@@ -56,10 +63,6 @@ class ClientControl: public QObject
             }
             return m_instance;
         }
-        void receive();
-        void init();
-        bool connecttoRobot();
-        bool stopConnectionRobot();
         void setRightSpeed(unsigned char speed);
         void setLeftSpeed(unsigned char speed);
         void setRightSpeedFlag(unsigned char flag);
@@ -72,10 +75,9 @@ class ClientControl: public QObject
         unsigned char getRightSpeedLoop(){return rightSpeedLoop;}
         unsigned char getRightSpeed(){return rightSpeed;}
         unsigned char getLeftSpeed(){return leftSpeed;}
-        unsigned char getConnected(){return connected;}
+        unsigned char getConnected(){return connectedState;}
         QString getIp(){return IP;}
         int getPort(){return port;}
-        QTcpSocket* getSocket(){return &soc;}
 };
 
 #endif // CLIENTCONTROL_H

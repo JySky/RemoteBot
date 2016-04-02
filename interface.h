@@ -6,28 +6,29 @@
 #include <iostream>
 #include <stdio.h>
 #include "clientcamera.h"
-#include "robotinfo.h"
 #include "clickablelabel.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QIcon>
 #include <QString>
 #include <iostream>
+#include <about.h>
+#include <QThread>
 
 namespace Ui {
-class Interface;
+    class Interface;
 }
+
 class ClientControl;
 class ClientCamera;
-class RobotInfo;
+class About;
 
 class Interface : public QMainWindow
 {
         Q_OBJECT
 
         private:
-            QNetworkAccessManager mgr;
-            QNetworkRequest req;
+            QThread controlThread;
             Ui::Interface *ui;
             ClientControl *Clientcont;
             ClientCamera *Clientcam;
@@ -78,24 +79,34 @@ class Interface : public QMainWindow
             void on_actionActiver_Manette_changed();
             void on_actionActiver_Traitement_Image_changed();
             void on_actionCamera_Automatique_changed();
-
-        signals:
-            void newvalue(int value);
+            void on_actionA_propos_triggered();
 
         public:
             Ui::Interface *getUi(){return ui;}
             explicit Interface(QWidget *parent = 0);
             ~Interface();
             void setcolorConnected(QString color);
-            void majInterface(RobotInfo dataR, RobotInfo dataL);
             void setQWebView(QString link);
             void setImage(QImage img);
             void setImage(QString img);
             int getSliderCam();
+            void setBatLevel(int lvl);
+            void setVitLeft(int lvl);
+            void setVitRight(int lvl);
 
         public slots :
             void camDisconnected();
+            void camStreamState();
+            void camConnected();
             void robotDisconnected();
+            void robotConnected();
+
+        signals:
+            void robotConnect();
+            void robotDisconnect();
+            void camConnect();
+            void camDisconnect();
+
 };
 
 #endif // INTERFACE_H

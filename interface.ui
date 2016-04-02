@@ -256,25 +256,6 @@
      <string>Stop</string>
     </property>
    </widget>
-   <widget class="QLabel" name="pingLabel">
-    <property name="geometry">
-     <rect>
-      <x>236</x>
-      <y>10</y>
-      <width>31</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="remotebot.qrc">:/image/image/ping.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="batteryLabel">
     <property name="geometry">
      <rect>
@@ -579,36 +560,6 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>10</y>
-      <width>41</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>LcdD</family>
-      <pointsize>14</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>0</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>0</number>
-    </property>
-    <property name="indent">
-     <number>6</number>
-    </property>
-   </widget>
    <widget class="QLabel" name="colorConnected">
     <property name="geometry">
      <rect>
@@ -626,24 +577,6 @@
     </property>
     <property name="scaledContents">
      <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QWebView" name="webView">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>60</y>
-      <width>381</width>
-      <height>291</height>
-     </rect>
-    </property>
-    <property name="url">
-     <url>
-      <string>about:blank</string>
-     </url>
-    </property>
-    <property name="zoomFactor">
-     <double>1.250000000000000</double>
     </property>
    </widget>
    <widget class="QLabel" name="logo">
@@ -767,40 +700,6 @@
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
-   <zorder>webView</zorder>
-   <zorder>pbSpeedLF</zorder>
-   <zorder>pbSpeedLR</zorder>
-   <zorder>frame</zorder>
-   <zorder>pbSpeedRF</zorder>
-   <zorder>pbSpeedRR</zorder>
-   <zorder>sliderSpeed</zorder>
-   <zorder>batteryLevel</zorder>
-   <zorder>line</zorder>
-   <zorder>line_2</zorder>
-   <zorder>robotStart</zorder>
-   <zorder>robotStop</zorder>
-   <zorder>pingLabel</zorder>
-   <zorder>batteryLabel</zorder>
-   <zorder>cameraUp</zorder>
-   <zorder>dotCamera</zorder>
-   <zorder>cameraRight</zorder>
-   <zorder>cameraLeft</zorder>
-   <zorder>cameraDown</zorder>
-   <zorder>robotLeft</zorder>
-   <zorder>dotRobot</zorder>
-   <zorder>robotUp</zorder>
-   <zorder>robotDown</zorder>
-   <zorder>robotRight</zorder>
-   <zorder>vitesseLogo</zorder>
-   <zorder>displaySpeedSet</zorder>
-   <zorder>displaySpeed</zorder>
-   <zorder>label</zorder>
-   <zorder>colorConnected</zorder>
-   <zorder>logo</zorder>
-   <zorder>logo2</zorder>
-   <zorder>sliderSpeedCam</zorder>
-   <zorder>displaySpeedSetCam</zorder>
-   <zorder>line_3</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -891,11 +790,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
   <customwidget>
    <class>ClickableLabel</class>
    <extends>QLabel</extends>

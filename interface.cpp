@@ -19,6 +19,14 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interfac
     camAuto=false;
     imgProc=false;
     controllerOn=false;
+
+    //Clientcam->moveToThread(&controlThread);
+    QObject::connect(this, SIGNAL(robotConnect()),Clientcont, SLOT(connect()));
+    QObject::connect(this, SIGNAL(robotDisconnect()),Clientcont, SLOT(disconnect()));
+    QObject::connect(this, SIGNAL(camConnect()),Clientcam, SLOT(connect()));
+    QObject::connect(this, SIGNAL(camDisconnect()),Clientcam, SLOT(disconnect()));
+
+    //controlThread.start();
 }
 
 void Interface::keyPressEvent(QKeyEvent *event)
@@ -112,6 +120,22 @@ void Interface::robotDisconnected()
     majConnectedState();
 }
 
+void Interface::robotConnected()
+{
+    robotconnected=true;
+    majConnectedState();
+}
+
+void Interface::camConnected()
+{
+    camconnected=true;
+    majConnectedState();
+}
+
+void Interface::camStreamState()
+{
+
+}
 void Interface::majConnectedState()
 {
 
@@ -136,17 +160,37 @@ void Interface::majConnectedState()
 
 void Interface::on_robotStart_clicked()
 {
-    robotconnected=Clientcont->connecttoRobot();
-    camconnected=Clientcam->connecttoCamera();
+    //robotconnected=Clientcont->connecttoRobot();
+    emit robotConnect();
+    emit camConnect();
     majConnectedState();
 }
 
 void Interface::on_robotStop_clicked()
 {
-    Clientcont->stopConnectionRobot();
-    Clientcam->stopConnectionCamera();
+    //Clientcont->stopConnectionRobot();
+    emit robotDisconnect();
+    emit camDisconnect();
     this->setcolorConnected("red");
 }
+
+
+
+Interface::~Interface()
+{
+    delete ui;
+}
+
+void Interface::on_actionPort_et_IP_triggered()
+{
+    Config* window= new Config();
+    window->exec();
+}
+
+
+
+
+//************** SET GET **************//
 
 void Interface::setcolorConnected(QString color)
 {
@@ -166,41 +210,16 @@ void Interface::setcolorConnected(QString color)
     //ui->colorConnected->setStyleSheet("QLabel#colorConnected { background-color :  "+color+";}");
 }
 
-Interface::~Interface()
+void Interface::setBatLevel(int lvl)
 {
-    delete ui;
-}
-
-void Interface::on_actionPort_et_IP_triggered()
-{
-    Config* window= new Config();
-    window->exec();
-}
-
-
-
-void Interface::majInterface(RobotInfo dataR, RobotInfo dataL)
-{
-    ui->batteryLevel->setValue((int)(dataL.getBatLevel()/(-2.55)));
-   /* if(dataR.SpeedFront>=0)
+    if(lvl>140)
     {
-        ui->pbSpeedRF->setValue(dataR.SpeedFront);
+        ui->batteryLevel->setValue(50);
     }
     else
     {
-         ui->pbSpeedRR->setValue(dataR.SpeedFront);
+        ui->batteryLevel->setValue((lvl*100)/130);
     }
-
-    if(dataL.SpeedFront>=0)
-    {
-
-        ui->pbSpeedLF->setValue(dataR.SpeedFront);
-    }
-    else
-    {
-         ui->pbSpeedLR->setValue(dataR.SpeedFront);
-    }*/
-   // ui->displaySpeed->display(5);
 }
 
 void Interface::setImage(QImage img)
@@ -212,10 +231,64 @@ void Interface::setImage(QString img)
 {
      ui->frame->setPixmap(img);
 }
+
 void Interface::setQWebView(QString link)
 {
-    ui->webView->setUrl(link);
+   // ui->webView->setUrl(link);
 }
+
+void Interface::setVitLeft(int lvl)
+{
+    if((lvl>40) && (lvl<130))
+    {
+        ui->pbSpeedLF->setValue(25);
+    }else if((lvl<(-90)) && (lvl>(-130)))
+    {
+        ui->pbSpeedLF->setValue(80);
+    }else
+    {
+        ui->pbSpeedLF->setValue(0);
+    }
+
+    if((lvl<(-130)) && (lvl>(-180)))
+    {
+        ui->pbSpeedLR->setValue(25);
+    }else if((lvl<(-300)) && (lvl>(-390)))
+    {
+        ui->pbSpeedLR->setValue(80);
+    }
+    else
+    {
+        ui->pbSpeedLR->setValue(0);
+    }
+}
+
+void Interface::setVitRight(int lvl)
+{
+    if((lvl>40) && (lvl<130))
+    {
+        ui->pbSpeedRF->setValue(25);
+    }else if((lvl<(-90)) && (lvl>(-130)))
+    {
+        ui->pbSpeedRF->setValue(80);
+    }else
+    {
+        ui->pbSpeedRF->setValue(0);
+    }
+
+    if((lvl<(-130)) && (lvl>(-180)))
+    {
+        ui->pbSpeedRR->setValue(25);
+    }else if((lvl<(-300)) && (lvl>(-390)))
+    {
+        ui->pbSpeedRR->setValue(80);
+    }
+    else
+    {
+        ui->pbSpeedRR->setValue(0);
+    }
+}
+
 int Interface::getSliderCam()
 {
     return ui->sliderSpeedCam->value();
@@ -622,4 +695,10 @@ void Interface::on_actionCamera_Automatique_changed()
         camAuto=true;
     }
     Clientcam->setCamAuto(camAuto);
+}
+
+void Interface::on_actionA_propos_triggered()
+{
+    About* window= new About();
+    window->exec();
 }

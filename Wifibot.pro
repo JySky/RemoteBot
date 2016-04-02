@@ -20,21 +20,59 @@ SOURCES += main.cpp\
         interface.cpp \
     clientcontrol.cpp \
     config.cpp \
-    cameratraitement.cpp \
     clientcamera.cpp \
-    robotinfo.cpp \
-    clickablelabel.cpp
+    clickablelabel.cpp \
+    about.cpp
 
 HEADERS  += interface.h \
     clientcontrol.h \
     config.h \
-    cameratraitement.h \
     clientcamera.h \
-    robotinfo.h \
-    clickablelabel.h
+    clickablelabel.h \
+    about.h
 
 FORMS    += interface.ui \
-    config.ui
+    config.ui \
+    about.ui
 
 RESOURCES += \
     remotebot.qrc
+
+INCLUDEPATH += C:/OpencvQT/install/include \
+            C:/OpencvQT/install/highgui
+
+LIBS += -L C:\\OpencvQT\install\x86\mingw\bin \
+    libopencv_core310 \
+    libopencv_highgui310 \
+    libopencv_imgproc310 \
+    libopencv_features2d310 \
+    libopencv_calib3d310 \
+    libopencv_videoio310
+
+LIBS += -LC:\\OpencvQT\install\x86\mingw\lib \
+    libopencv_highgui310 \
+    libopencv_core310   \
+    libopencv_video310     \
+    libopencv_videostab310 \
+    libopencv_imgproc310 \
+    libopencv_features2d310 \
+    libopencv_calib3d310 \
+    libopencv_videoio310
+
+LIBS += -LC:\\OpencvQT\bin \
+    libopencv_core310 \
+    libopencv_highgui310 \
+    libopencv_imgproc310 \
+    libopencv_features2d310 \
+    libopencv_calib3d310 \
+    libopencv_videoio310
+
+LIBS += -LC:\\OpencvQT\lib \
+    libopencv_highgui310 \
+    libopencv_core310   \
+    libopencv_video310     \
+    libopencv_videostab310 \
+    libopencv_imgproc310 \
+    libopencv_features2d310 \
+    libopencv_calib3d310 \
+    libopencv_videoio310

@@ -16,6 +16,7 @@ Config::Config(QDialog *parent) :
     ui->IPRobot->setText(IPRobot);
     ui->PortRobot->setText(QString::number(portRobot));
     ui->PortCamera->setText(QString::number(portCamera));
+    this->setAttribute(Qt::WA_DeleteOnClose );
 }
 
 Config::~Config()

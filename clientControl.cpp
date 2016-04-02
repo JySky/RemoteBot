@@ -16,60 +16,39 @@ ClientControl::ClientControl(Interface *inter)
     leftSpeedFlag=0;
     leftSpeedLoop=0;
     rightSpeedLoop=0;
-    connected=false;
-    connect(&soc, SIGNAL(disconnected()),this, SLOT(disconnected()));
-    connect(&soc, SIGNAL(disconnected()),MainInter, SLOT(robotDisconnected()));
+    connectedState=false;
+    QObject::connect(&soc, SIGNAL(disconnected()),this, SLOT(disconnect()));
+    QObject::connect(&soc, SIGNAL(disconnected()),MainInter, SLOT(robotDisconnected()));
+    QObject::connect(this, SIGNAL(connected()),MainInter, SLOT(robotConnected()));
 }
 
 void ClientControl::processing()
 {
     timer.setInterval(50);
-    timer2.setInterval(100);
-    connect(&timer, SIGNAL (timeout()), this, SLOT (dataWrite()));
-    connect(&timer2, SIGNAL (timeout()), this, SLOT (dataRead()));
+    QObject::connect(&timer, SIGNAL (timeout()), this, SLOT (dataWrite()));
+    QObject::connect(&timer, SIGNAL (timeout()), this, SLOT (dataRead()));
     timer.start();
-    timer2.start();
 }
 
 void ClientControl::stopProcessing()
 {
     timer.stop();
-    timer2.stop();
 }
 
-void ClientControl::dataWrite()
-{
-    if(soc.open(QIODevice::ReadWrite))
-    {
-        send();
-    }
-}
-void ClientControl::dataRead()
-{
-    if(soc.open(QIODevice::ReadWrite))
-    {
-        QByteArray data;
-        soc.waitForReadyRead(100);
-        if(soc.bytesAvailable()>=21)
-        {
-            data=soc.read(21);
-            receive(data);
-        }
-    }
-}
 
-bool ClientControl::connecttoRobot()
+void ClientControl::connect()
 {
     soc.connectToHost(IP,port);
 
     if(!soc.waitForConnected(5000))
     {
-        connected=false;
+        connectedState=false;
     }
     else
     {
-        connected=true;
+        connectedState=true;
         soc.open(QIODevice::ReadWrite);
+        emit connected();
         processing();
     }
     if(soc.state()==QAbstractSocket::UnconnectedState)
@@ -81,44 +60,14 @@ bool ClientControl::connecttoRobot()
               tr("Robot"),
               tr(msg) );
     }
-    return connected;
 }
 
-void ClientControl::setRightSpeed(unsigned char speed)
-{
-    rightSpeed = speed;
-}
-
-void ClientControl::setLeftSpeed(unsigned char speed)
-{
-    leftSpeed = speed;
-}
-
-void ClientControl::setRightSpeedFlag(unsigned char flag)
-{
-    rightSpeedFlag = flag;
-}
-
-void ClientControl::setLeftSpeedFlag(unsigned char flag)
-{
-    leftSpeedFlag = flag;
-}
-void ClientControl::setIp(QString i)
-{
-    IP = i;
-}
-
-void ClientControl::setPort(int p)
-{
-    port = p;
-}
-
-bool ClientControl::stopConnectionRobot()
+void ClientControl::disconnect()
 {
     soc.close();
-    connected=false;
+    connectedState=false;
     stopProcessing();
-    if((soc.state()==QAbstractSocket::UnconnectedState) && soc.isValid())
+    if(!connectedState)//(soc.state()==QAbstractSocket::UnconnectedState) && soc.isValid())
     {
         std::string s ="Disconnected from"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
         const char* msg=s.c_str();
@@ -126,29 +75,10 @@ bool ClientControl::stopConnectionRobot()
               MainInter,
               tr("Robot"),
               tr(msg) );
+        emit disconnected();
     }
-    MainInter->setcolorConnected("red");
-    return connected;
-
 }
 
-void ClientControl::disconnected()
-{
-    soc.close();
-    connected=false;
-    timer.stop();
-    timer2.stop();
-    if(soc.state()==QAbstractSocket::UnconnectedState)
-    {
-        std::string s ="Disconnected from"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
-        const char* msg=s.c_str();
-        QMessageBox::information(
-              MainInter,
-              tr("Robot"),
-              tr(msg) );
-    }
-    MainInter->setcolorConnected("red");
-}
 
 void ClientControl::send()
 {
@@ -200,29 +130,106 @@ quint16 ClientControl::Crc16(QByteArray* byteArray, int pos){
 
 void ClientControl::receive(QByteArray data)
 {
-    RobotInfo dataL;
-    RobotInfo dataR;
-    dataL.setSpeedFront((int)((data.at(1) << 8) + data.at(0)));
-    if (dataL.getSpeedFront() > 32767)
-        dataL.setSpeedFront(dataL.getSpeedFront()-65536);
-    dataL.setBatLevel(data.at(2));
-    qDebug()<<((int)data.at(2));
-    dataL.setIR(data.at(3));
-    dataL.setIR2(data.at(4));
-    dataL.setodometry(((((long)data.at(8) << 24))+(((long)data.at(7) <<16))+(((long)data.at(6) << 8))+((long)data.at(5))));
-    dataR.setSpeedFront(((int)(data.at(10) << 8) + data.at(9)));
-    if (dataR.getSpeedFront() > 32767)
-        dataR.setSpeedFront(dataR.getSpeedFront()-65536);
-    dataR.setBatLevel(0);
-    dataR.setIR(data.at(11));
-    dataR.setIR2(data.at(12));
-    dataR.setodometry(((((long)data.at(16)<< 24))+(((long)data.at(15) <<16))+(((long)data.at(14) << 8))+((long)data.at(13))));
-    dataL.setCurrent(data.at(17));
-    dataR.setCurrent(data.at(17));
-    dataL.setVersion(data.at(18));
-    dataR.setVersion(data.at(18));
-    qDebug()<<data;
-    MainInter->majInterface(dataR,dataL);
+
+    quint32 odoL,odoR;
+    int speedL,speedR;
+    quint8 battery,adc0,adc1,adc3,adc4,current,version;
+    // Left
+    speedL = (int)(data.at(0)+(data.at(1)<<8));
+    qDebug()<<"speedL";
+    qDebug()<<(int)speedL;
+    battery = data.at(2);
+    MainInter->setBatLevel((int)battery);
+
+    adc4 = data.at(3);
+    adc3 = data.at(4);
+
+    odoL = data.at(5)+(data.at(6)<<8)+(data.at(7)<<16)+(data.at(8)<<24);
+    MainInter->setVitLeft(speedL);
+    //dataL.setSpeedFront((int)speedL);
+    //dataL.setBatLevel((float)battery*0.1);
+    /*qDebug()<<"adc4";
+    qDebug()<<adc4;
+    qDebug()<<"adc3";
+    qDebug()<<adc3;
+    qDebug()<<"odoL";
+    qDebug()<<odoL;*/
+    // Right
+    speedR = data.at(9)+(data.at(10)<<8);
+    adc0 = data.at(11);
+    adc1 = data.at(12);
+
+    odoR = data.at(13)+(data.at(14)<<8)+(data.at(15)<<16)+(data.at(16)<<24);
+    MainInter->setVitRight(speedR);
+    current = data.at(17);
+    version = data.at(18);
+
+    //qDebug()<<"speedR";
+    //qDebug()<<(int)speedR;
+    /*qDebug()<<"adc0";
+    qDebug()<<adc0;
+    qDebug()<<"adc1";
+    qDebug()<<adc1;
+    qDebug()<<"odoR";
+    qDebug()<<odoR;
+    qDebug()<<"current";
+    qDebug()<<current;
+    qDebug()<<"version";
+    qDebug()<<version;*/
+    //MainInter->majInterface(dataR,dataL);
+}
+
+//************** SLOTS **************//
+
+void ClientControl::dataWrite()
+{
+    if(soc.open(QIODevice::ReadWrite))
+    {
+        send();
+    }
+}
+void ClientControl::dataRead()
+{
+    if(soc.open(QIODevice::ReadWrite))
+    {
+        QByteArray data;
+        soc.waitForReadyRead(100);
+        if(soc.bytesAvailable()>=21)
+        {
+            data=soc.read(21);
+            receive(data);
+        }
+    }
+}
+//************** SET GET **************//
+
+void ClientControl::setRightSpeed(unsigned char speed)
+{
+    rightSpeed = speed;
+}
+
+void ClientControl::setLeftSpeed(unsigned char speed)
+{
+    leftSpeed = speed;
+}
+
+void ClientControl::setRightSpeedFlag(unsigned char flag)
+{
+    rightSpeedFlag = flag;
+}
+
+void ClientControl::setLeftSpeedFlag(unsigned char flag)
+{
+    leftSpeedFlag = flag;
+}
+void ClientControl::setIp(QString i)
+{
+    IP = i;
+}
+
+void ClientControl::setPort(int p)
+{
+    port = p;
 }
 
 ClientControl::~ClientControl()

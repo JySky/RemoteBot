@@ -20,5 +20,6 @@
         <file>image/RemoteBot.ico</file>
         <file>image/remotebot.png</file>
         <file>image/arrowDotCameraPressed.png</file>
+        <file>image/about.png</file>
     </qresource>
 </RCC>
