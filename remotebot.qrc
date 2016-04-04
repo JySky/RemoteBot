@@ -21,5 +21,9 @@
         <file>image/remotebot.png</file>
         <file>image/arrowDotCameraPressed.png</file>
         <file>image/about.png</file>
+        <file>image/batteryCharging.png</file>
+        <file>image/batteryLow.png</file>
+        <file>RemoteBot.ico</file>
+        <file>image/current.png</file>
     </qresource>
 </RCC>

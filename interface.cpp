@@ -19,6 +19,15 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interfac
     camAuto=false;
     imgProc=false;
     controllerOn=false;
+    /*
+     *
+     *
+     *
+     *
+     * AJOUTER FONCTION ENREGISTRER IMAGE
+     *
+     *
+     * */
 
     //Clientcam->moveToThread(&controlThread);
     QObject::connect(this, SIGNAL(robotConnect()),Clientcont, SLOT(connect()));
@@ -214,10 +223,19 @@ void Interface::setBatLevel(int lvl)
 {
     if(lvl>140)
     {
-        ui->batteryLevel->setValue(50);
+        ui->batteryLevel->setValue(100);
+        QPixmap mypix (":/image/image/batteryCharging.png");
+        ui->batteryLabel->setPixmap(mypix);
+    }else if(lvl<40)
+    {
+        QPixmap mypix (":/image/image/batteryLow.png");
+        ui->batteryLabel->setPixmap(mypix);
+        ui->batteryLevel->setValue((lvl*100)/130);
     }
     else
     {
+        QPixmap mypix (":/image/image/battery.png");
+        ui->batteryLabel->setPixmap(mypix);
         ui->batteryLevel->setValue((lvl*100)/130);
     }
 }
@@ -232,14 +250,9 @@ void Interface::setImage(QString img)
      ui->frame->setPixmap(img);
 }
 
-void Interface::setQWebView(QString link)
-{
-   // ui->webView->setUrl(link);
-}
-
 void Interface::setVitLeft(int lvl)
 {
-    if((lvl>40) && (lvl<130))
+    /*if((lvl>40) && (lvl<130))
     {
         ui->pbSpeedLF->setValue(25);
     }else if((lvl<(-90)) && (lvl>(-130)))
@@ -260,12 +273,12 @@ void Interface::setVitLeft(int lvl)
     else
     {
         ui->pbSpeedLR->setValue(0);
-    }
+    }*/
 }
 
 void Interface::setVitRight(int lvl)
 {
-    if((lvl>40) && (lvl<130))
+    /*if((lvl>40) && (lvl<130))
     {
         ui->pbSpeedRF->setValue(25);
     }else if((lvl<(-90)) && (lvl>(-130)))
@@ -286,7 +299,42 @@ void Interface::setVitRight(int lvl)
     else
     {
         ui->pbSpeedRR->setValue(0);
-    }
+    }*/
+}
+
+void Interface::setIR1(int lvl)
+{
+    ui->displayIR1->setNum(lvl);
+}
+
+void Interface::setIR2(int lvl)
+{
+    ui->displayIR2->setNum(lvl);
+}
+
+void Interface::setIR3(int lvl)
+{
+    ui->displayIR3->setNum(lvl);
+}
+
+void Interface::setIR4(int lvl)
+{
+    ui->displayIR4->setNum(lvl);
+}
+
+void Interface::setVersion(int vers)
+{
+    ui->displayVersion->setNum(vers);
+}
+
+void Interface::setCurrent(int curr)
+{
+    ui->displayCurrent->setNum(curr);
+}
+
+void Interface::setAngle(int ang)
+{
+    ui->displayCamAngle->setNum(ang);
 }
 
 int Interface::getSliderCam()
@@ -700,5 +748,11 @@ void Interface::on_actionCamera_Automatique_changed()
 void Interface::on_actionA_propos_triggered()
 {
     About* window= new About();
+    window->exec();
+}
+
+void Interface::on_actionTutoriel_triggered()
+{
+    tutorial* window= new tutorial();
     window->exec();
 }

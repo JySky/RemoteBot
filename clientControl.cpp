@@ -7,6 +7,7 @@ using namespace std;
 
 ClientControl::ClientControl(Interface *inter)
 {
+
     MainInter=inter;
     port=15020;
     IP="192.168.1.106";
@@ -131,52 +132,60 @@ quint16 ClientControl::Crc16(QByteArray* byteArray, int pos){
 void ClientControl::receive(QByteArray data)
 {
 
-    quint32 odoL,odoR;
+    long odoL,odoR;
     int speedL,speedR;
-    quint8 battery,adc0,adc1,adc3,adc4,current,version;
+    quint8 battery;
+    int ir1,ir2,ir3,ir4,current,version;
+
     // Left
-    speedL = (int)(data.at(0)+(data.at(1)<<8));
+    speedL = (int)((data.at(1) << 8) + data.at(0));
+    if (speedL > 32767)
+        speedL=speedL-65536;
+    //speedL=speedL;
+
     qDebug()<<"speedL";
     qDebug()<<(int)speedL;
+
+
+    /**/
     battery = data.at(2);
-    MainInter->setBatLevel((int)battery);
+    /**/
 
-    adc4 = data.at(3);
-    adc3 = data.at(4);
 
-    odoL = data.at(5)+(data.at(6)<<8)+(data.at(7)<<16)+(data.at(8)<<24);
-    MainInter->setVitLeft(speedL);
-    //dataL.setSpeedFront((int)speedL);
-    //dataL.setBatLevel((float)battery*0.1);
-    /*qDebug()<<"adc4";
-    qDebug()<<adc4;
-    qDebug()<<"adc3";
-    qDebug()<<adc3;
-    qDebug()<<"odoL";
-    qDebug()<<odoL;*/
+    ir4 = data.at(3);
+    ir3 = data.at(4);
+
+    //odoL = data.at(5)+(data.at(6)<<8)+(data.at(7)<<16)+(data.at(8)<<24);
+    odoL=((((long)data.at(8) << 24))+(((long)data.at(7) << 16))+(((long)data.at(6) << 8))+((long)data.at(5)));
+
     // Right
-    speedR = data.at(9)+(data.at(10)<<8);
-    adc0 = data.at(11);
-    adc1 = data.at(12);
+    speedR=(int)((data.at(10) << 8) + data.at(9));
+    if (speedR> 32767)
+        speedR=speedR-65536;
+    speedR=speedR;
 
-    odoR = data.at(13)+(data.at(14)<<8)+(data.at(15)<<16)+(data.at(16)<<24);
-    MainInter->setVitRight(speedR);
+
+    ir1 = data.at(11);
+    ir2 = data.at(12);
+
+    odoR=((((long) data.at(16) << 24))+(((long) data.at(15) << 16))+(((long) data.at(14) << 8))+((long) data.at(13)));
+
+    //odoR = data.at(13)+(data.at(14)<<8)+(data.at(15)<<16)+(data.at(16)<<24);
+
     current = data.at(17);
     version = data.at(18);
 
-    //qDebug()<<"speedR";
-    //qDebug()<<(int)speedR;
-    /*qDebug()<<"adc0";
-    qDebug()<<adc0;
-    qDebug()<<"adc1";
-    qDebug()<<adc1;
-    qDebug()<<"odoR";
-    qDebug()<<odoR;
-    qDebug()<<"current";
-    qDebug()<<current;
-    qDebug()<<"version";
-    qDebug()<<version;*/
-    //MainInter->majInterface(dataR,dataL);
+
+    MainInter->setBatLevel((int)battery);
+    MainInter->setVitLeft(speedL);
+    MainInter->setVitRight(speedR);
+    MainInter->setCurrent(current);
+    MainInter->setIR1(ir1);
+    MainInter->setIR2(ir2);
+    MainInter->setIR3(ir3);
+    MainInter->setIR4(ir4);
+    MainInter->setVersion(version);
+
 }
 
 //************** SLOTS **************//

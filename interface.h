@@ -13,6 +13,7 @@
 #include <QString>
 #include <iostream>
 #include <about.h>
+#include <tutorial.h>
 #include <QThread>
 
 namespace Ui {
@@ -22,6 +23,7 @@ namespace Ui {
 class ClientControl;
 class ClientCamera;
 class About;
+class tutorial;
 
 class Interface : public QMainWindow
 {
@@ -81,18 +83,26 @@ class Interface : public QMainWindow
             void on_actionCamera_Automatique_changed();
             void on_actionA_propos_triggered();
 
+            void on_actionTutoriel_triggered();
+
         public:
             Ui::Interface *getUi(){return ui;}
             explicit Interface(QWidget *parent = 0);
             ~Interface();
             void setcolorConnected(QString color);
-            void setQWebView(QString link);
             void setImage(QImage img);
             void setImage(QString img);
             int getSliderCam();
             void setBatLevel(int lvl);
             void setVitLeft(int lvl);
             void setVitRight(int lvl);
+            void setIR1(int lvl);
+            void setIR2(int lvl);
+            void setIR3(int lvl);
+            void setIR4(int lvl);
+            void setVersion(int vers);
+            void setCurrent(int curr);
+            void setAngle(int ang);
 
         public slots :
             void camDisconnected();

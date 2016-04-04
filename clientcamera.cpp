@@ -158,11 +158,14 @@ void ClientCamera::moveCam(int pos)
 
 void ClientCamera::urlAccess(QString url)
 {
-    QNetworkAccessManager* mng = new QNetworkAccessManager(this);
-    QNetworkRequest request;
-    request.setUrl(QUrl(url));
-    QNetworkReply *reply =mng->get(request);
-    //mng->clearAccessCache();
+    if(connectedState)
+    {
+        QNetworkAccessManager* mng = new QNetworkAccessManager(this);
+        QNetworkRequest request;
+        request.setUrl(QUrl(url));
+        QNetworkReply *reply =mng->get(request);
+        //mng->clearAccessCache();
+    }
 }
 
 bool ClientCamera::urlAccessState(QString url)
@@ -227,13 +230,11 @@ void ClientCamera::setVitesseVar()
 void ClientCamera::openImageVStream()
 {
     url=QString("http://"+IP+":"+QString::number(port));
-    videoStreamAddress=url+"/?action=stream";//"/javascript_simple.html";/cameras/1?q=30 /?action=snapshot&n=7 /?action=stream
+    videoStreamAddress=url+"/cameras/1?q=3";//"/javascript_simple.html";/cameras/1?q=30 /?action=snapshot&n=7 /?action=stream
     if(!vcap.open(videoStreamAddress.toStdString()))
     {
         qDebug() << "Error opening video stream or file";
     }
-    /*frame= Mat(1,1, CV_64F, cvScalar(0.));
-    prevFrame = Mat(1,1, CV_64F, cvScalar(0.));*/
 }
 
 void ClientCamera::getImageVStream()
@@ -250,56 +251,8 @@ void ClientCamera::getImageVStream()
     imshow("res2", blu);
     imshow( "result", frame );
     waitKey(1);
-    /*if(fisrtframe)
-    {
-        fisrtframe=false;
-        output = cvCreateImage(cvSize(frame.cols, frame.rows), IPL_DEPTH_8U, 1);
-        prev = cvCreateImage(cvSize(frame.cols, frame.rows), IPL_DEPTH_8U, 3);
-        cvZero(prev);
-    }*/
-
-    /*IplImage ipltemp = frame;
-    cvCopy(&ipltemp, crt);*/
-
-    //motionDetection(crt,prev,output,60);
-    //frame=cvarrToMat(output);
-    //prevFrame=cvarrToMat(output);
 
     MainInter->setImage(getQImageFromFrame(frame));
-}
-
-void ClientCamera::motionDetection(IplImage* crt_img, IplImage* prev_img, IplImage* output_img, int seuil)
-{
-    IplImage* img_prev=cvCreateImage(cvGetSize(prev_img),IPL_DEPTH_8U,3);
-    IplImage* img_crt=cvCreateImage(cvGetSize(crt_img),IPL_DEPTH_8U,3);
-
-    cvCvtColor(crt_img,output_img,CV_RGB2GRAY);
-
-    cvCopy(prev_img,img_prev, NULL);
-    cvCopy(crt_img,img_crt, NULL);
-
-    GrayImage img_w(img_crt);
-    GrayImage img_fw(img_prev);
-    GrayImage img_t(output_img);
-
-    CvSize size = cvGetSize(prev_img);
-
-    for(int i=0; i <size.width;i++)
-    {
-        for(int j=0; j < size.height;j++)
-        {
-            int a = img_w[j][i];
-            int b = img_fw[j][i];
-            if( a-b>seuil)
-            {
-                img_t[j][i] = 255;
-            }
-            else
-            {
-                img_t[j][i] = 0;
-            }
-        }
-    }
 }
 
 QImage ClientCamera::getQImageFromFrame(Mat f)

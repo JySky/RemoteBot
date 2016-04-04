@@ -75,12 +75,12 @@ class ClientCamera: public QObject
         void processing();
         void openImageVStream();
         QImage getQImageFromFrame(Mat f);
-        void motionDetection(IplImage* crt_img, IplImage* prev_img, IplImage* output_img, int seuil);
 
     private slots:
         void disconnect();
         void connect();
         void getImageVStream();
+
     signals:
         void disconnected();
         void connected();
@@ -103,29 +103,4 @@ class ClientCamera: public QObject
         void setCamAuto(bool c){camAuto=c;}
         void moveCam(int pos);
 };
-
-template<class T> class Image
-{
-  private:
-  IplImage* imgp;
-  public:
-  Image(IplImage* img=0) {imgp=img;}
-  ~Image(){imgp=0;}
-  void operator=(IplImage* img) {imgp=img;}
-  inline T* operator[](const int rowIndx) {
-    return ((T *)(imgp->imageData + rowIndx*imgp->widthStep));}
-};
-
-typedef struct{
-  unsigned char b,g,r;
-} RgbPixel;
-
-typedef struct{
-  float b,g,r;
-} RgbPixelFloat;
-
-typedef Image<RgbPixel>       RgbImage;
-typedef Image<RgbPixelFloat>  RgbImageFloat;
-typedef Image<unsigned char>  GrayImage;
-typedef Image<float>          GrayImageFloat;
 #endif // CLIENTCAMERA_H
