@@ -15,11 +15,14 @@
 #include <about.h>
 #include <tutorial.h>
 #include <QThread>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 namespace Ui {
     class Interface;
 }
-
+using namespace cv;
 class ClientControl;
 class ClientCamera;
 class About;
@@ -44,6 +47,7 @@ class Interface : public QMainWindow
             bool Dpressed;
             bool camAuto;
             bool imgProc;
+            bool bImshow;
             bool controllerOn;
             bool camconnected;
             bool robotconnected;
@@ -82,8 +86,8 @@ class Interface : public QMainWindow
             void on_actionActiver_Traitement_Image_changed();
             void on_actionCamera_Automatique_changed();
             void on_actionA_propos_triggered();
-
             void on_actionTutoriel_triggered();
+            void on_actionImshow_OpenCV_changed();
 
         public:
             Ui::Interface *getUi(){return ui;}
@@ -106,16 +110,23 @@ class Interface : public QMainWindow
 
         public slots :
             void camDisconnected();
+            void camNotConnected();
             void camStreamState();
             void camConnected();
             void robotDisconnected();
             void robotConnected();
+            void robotNotConnected();
+            void setFrame(QImage fr);
 
         signals:
+            void startImgProcessing();
+            void stopImgProcessing();
             void robotConnect();
             void robotDisconnect();
             void camConnect();
             void camDisconnect();
+            void startImshow();
+            void stopImshow();
 
 };
 

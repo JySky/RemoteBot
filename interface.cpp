@@ -18,6 +18,7 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interfac
     Dpressed=false;
     camAuto=false;
     imgProc=false;
+    bImshow=false;
     controllerOn=false;
     /*
      *
@@ -29,14 +30,20 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interfac
      *
      * */
 
-    //Clientcam->moveToThread(&controlThread);
-    QObject::connect(this, SIGNAL(robotConnect()),Clientcont, SLOT(connect()));
-    QObject::connect(this, SIGNAL(robotDisconnect()),Clientcont, SLOT(disconnect()));
-    QObject::connect(this, SIGNAL(camConnect()),Clientcam, SLOT(connect()));
-    QObject::connect(this, SIGNAL(camDisconnect()),Clientcam, SLOT(disconnect()));
-
-    //controlThread.start();
+    QObject::connect(this, SIGNAL(robotDisconnect()),Clientcont, SLOT(socketDisconnected()), Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(camDisconnect()),Clientcam, SLOT(disconnect()), Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(startImshow()),Clientcam, SLOT(openImshow()), Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(stopImshow()),Clientcam, SLOT(closeImshow()), Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(startImgProcessing()),Clientcam, SLOT(startImgProcess()), Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(stopImgProcessing()),Clientcam, SLOT(stopImgProcess()), Qt::DirectConnection);
 }
+
+Interface::~Interface()
+{
+    delete ui;
+}
+
+//********************************** KEY EVENTS **********************************//
 
 void Interface::keyPressEvent(QKeyEvent *event)
 {
@@ -117,15 +124,30 @@ void Interface::keyReleaseEvent(QKeyEvent *event)
     ControlDirection();
     ControlCam();
 }
+
+//********************************** SLOTS **********************************//
+
+void Interface::setFrame(QImage fr)
+{
+    setImage(fr);
+}
+
 void Interface::camDisconnected()
 {
     camconnected=false;
+    std::string s ="Disconnected from "+Clientcam->getIp().toStdString()+"/"+(QString::number(Clientcam->getPort())).toStdString();
+    const char* msg=s.c_str();
+    QMessageBox::information(this,tr("Camera"),tr(msg));
     majConnectedState();
 }
 
 void Interface::robotDisconnected()
 {
+
     robotconnected=false;
+    std::string s ="Disconnected from "+Clientcont->getIp().toStdString()+"/"+(QString::number(Clientcont->getPort())).toStdString();
+    const char* msg=s.c_str();
+    QMessageBox::information(this,tr("Robot"),tr(msg));
     majConnectedState();
 }
 
@@ -145,6 +167,7 @@ void Interface::camStreamState()
 {
 
 }
+
 void Interface::majConnectedState()
 {
 
@@ -152,42 +175,58 @@ void Interface::majConnectedState()
     {
         QPixmap mypix (":/image/image/connected.png");
         ui->colorConnected->setPixmap(mypix);
-
     }
     else if((robotconnected&&!camconnected)||(!robotconnected&&camconnected))
     {
 
         QPixmap mypix (":/image/image/connectwarning.png");
         ui->colorConnected->setPixmap(mypix);
+        if(!camconnected)
+        {
+            ui->frame->setPixmap(QPixmap());
+            ui->frame->setText("NO SIGNAL");
+            this->repaint();
+        }
     }
     else
     {
+        ui->frame->setPixmap(QPixmap());
+        ui->frame->setText("NO SIGNAL");
+        this->repaint();
         QPixmap mypix (":/image/image/disconnected.png");
         ui->colorConnected->setPixmap(mypix);
     }
 }
 
+void Interface::robotNotConnected()
+{
+    robotconnected=false;
+    std::string s ="Not connected to"+Clientcont->getIp().toStdString()+"/"+(QString::number(Clientcont->getPort())).toStdString();
+    const char* msg=s.c_str();
+    QMessageBox::critical(this,tr("Robot Error"),tr(msg));
+    majConnectedState();
+}
+void Interface::camNotConnected()
+{
+    camconnected=false;
+    std::string s ="Not connected to"+Clientcam->getIp().toStdString()+"/"+(QString::number(Clientcam->getPort())).toStdString();
+    const char* msg=s.c_str();
+    QMessageBox::critical(this,tr("Camera Error"),tr(msg));
+    majConnectedState();
+}
+
 void Interface::on_robotStart_clicked()
 {
-    //robotconnected=Clientcont->connecttoRobot();
-    emit robotConnect();
-    emit camConnect();
+    Clientcont->start();
+    Clientcam->start();
     majConnectedState();
 }
 
 void Interface::on_robotStop_clicked()
 {
-    //Clientcont->stopConnectionRobot();
     emit robotDisconnect();
     emit camDisconnect();
-    this->setcolorConnected("red");
-}
-
-
-
-Interface::~Interface()
-{
-    delete ui;
+    majConnectedState();
 }
 
 void Interface::on_actionPort_et_IP_triggered()
@@ -196,10 +235,7 @@ void Interface::on_actionPort_et_IP_triggered()
     window->exec();
 }
 
-
-
-
-//************** SET GET **************//
+//********************************** SET GET **********************************//
 
 void Interface::setcolorConnected(QString color)
 {
@@ -342,7 +378,10 @@ int Interface::getSliderCam()
     return ui->sliderSpeedCam->value();
 }
 
-//************** CONTROLE CAMERA **************//
+
+//********************************** CAMERA CONTROL **********************************//
+
+
 void Interface::ControlCam()
 {
     if(Zpressed && !Qpressed && !Spressed && !Dpressed)
@@ -516,8 +555,8 @@ void Interface::on_cameraRight_clicked()
     ControlCam();
 }
 
+//********************************** ROBOT CONTROL **********************************//
 
-//************** CONTROLE ROBOT **************//
 void Interface::ControlDirection()
 {
     if(Ipressed && !Jpressed && !Kpressed && !Lpressed)
@@ -705,11 +744,14 @@ void Interface::on_robotLeft_released()
     ControlDirection();
 }
 
+
+
+//********************************** FRAME ACTION **********************************//
+
 void Interface::on_actionQuitter_triggered()
 {
     this->close();
 }
-
 
 void Interface::on_actionActiver_Manette_changed()
 {
@@ -719,17 +761,6 @@ void Interface::on_actionActiver_Manette_changed()
     }else
     {
         controllerOn=true;
-    }
-}
-
-void Interface::on_actionActiver_Traitement_Image_changed()
-{
-    if(imgProc)
-    {
-        imgProc=false;
-    }else
-    {
-        imgProc=true;
     }
 }
 
@@ -756,3 +787,38 @@ void Interface::on_actionTutoriel_triggered()
     tutorial* window= new tutorial();
     window->exec();
 }
+
+void Interface::on_actionActiver_Traitement_Image_changed()
+{
+    if(imgProc)
+        imgProc=false;
+    else if(!imgProc)
+        imgProc=true;
+
+    if(imgProc)
+    {
+        emit startImgProcessing();
+    }
+    else
+    {
+        emit stopImgProcessing();
+    }
+}
+
+void Interface::on_actionImshow_OpenCV_changed()
+{
+    if(bImshow)
+        bImshow=false;
+    else if(!bImshow)
+        bImshow=true;
+
+    if(bImshow)
+    {
+        emit startImshow();
+    }
+    else
+    {
+        emit stopImshow();
+    }
+}
+

@@ -18,75 +18,112 @@ ClientControl::ClientControl(Interface *inter)
     leftSpeedLoop=0;
     rightSpeedLoop=0;
     connectedState=false;
-    QObject::connect(&soc, SIGNAL(disconnected()),this, SLOT(disconnect()));
-    QObject::connect(&soc, SIGNAL(disconnected()),MainInter, SLOT(robotDisconnected()));
-    QObject::connect(this, SIGNAL(connected()),MainInter, SLOT(robotConnected()));
+    QObject::connect(this, SIGNAL(connected()),MainInter, SLOT(robotConnected()), Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(disconnected()),MainInter, SLOT(robotDisconnected()), Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(socNotConnected()),MainInter, SLOT(robotNotConnected()), Qt::DirectConnection);
+    STOP=false;
 }
 
-void ClientControl::processing()
+//********************************** THREAD MANAGEMENT **********************************//
+void ClientControl::run()
 {
-    timer.setInterval(50);
-    QObject::connect(&timer, SIGNAL (timeout()), this, SLOT (dataWrite()));
-    QObject::connect(&timer, SIGNAL (timeout()), this, SLOT (dataRead()));
-    timer.start();
+    connect();
+    STOP=false;
+    if(connectedState)
+    {
+        while(!STOP)
+        {
+            mutex.lock();
+            dataWrite();
+            mutex.unlock();
+            mutex.lock();
+            dataRead();
+            mutex.unlock();
+        }
+    }
 }
 
-void ClientControl::stopProcessing()
+//********************************** SOCKET MANAGEMENT **********************************//
+
+void ClientControl::dataWrite()
 {
-    timer.stop();
+    if(soc->open(QIODevice::ReadWrite))
+    {
+        send();
+    }
 }
 
+void ClientControl::dataRead()
+{
+    if(soc->open(QIODevice::ReadWrite))
+    {
+        QByteArray data;
+        soc->waitForReadyRead(100);
+        if(soc->bytesAvailable()>=21)
+        {
+            data=soc->read(21);
+            receive(data);
+        }
+    }
+}
 
 void ClientControl::connect()
 {
-    soc.connectToHost(IP,port);
+    soc=new QTcpSocket();
+    QObject::connect(soc, SIGNAL(disconnected()),this, SLOT(socketDisconnected()), Qt::DirectConnection);
+    QObject::connect(soc, SIGNAL(disconnected()),MainInter, SLOT(robotDisconnected()), Qt::DirectConnection);
+    soc->connectToHost(IP,port);
 
-    if(!soc.waitForConnected(5000))
+    if(!soc->waitForConnected(5000))
     {
         connectedState=false;
     }
     else
     {
         connectedState=true;
-        soc.open(QIODevice::ReadWrite);
+        soc->open(QIODevice::ReadWrite);
         emit connected();
-        processing();
     }
-    if(soc.state()==QAbstractSocket::UnconnectedState)
+    if(soc->state()==QAbstractSocket::UnconnectedState)
     {
-        std::string s ="Not connected to"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
-        const char* msg=s.c_str();
-        QMessageBox::critical(
-              MainInter,
-              tr("Robot"),
-              tr(msg) );
+        emit socNotConnected();
     }
 }
 
 void ClientControl::disconnect()
 {
-    soc.close();
+    emit disconnected();
+    //mutex.lock();
+    STOP=true;
+    //soc->close();
+    //mutex.unlock();
     connectedState=false;
-    stopProcessing();
-    if(!connectedState)//(soc.state()==QAbstractSocket::UnconnectedState) && soc.isValid())
-    {
-        std::string s ="Disconnected from"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
-        const char* msg=s.c_str();
-        QMessageBox::information(
-              MainInter,
-              tr("Robot"),
-              tr(msg) );
-        emit disconnected();
-    }
 }
-
 
 void ClientControl::send()
 {
-    soc.waitForBytesWritten(10);
-    soc.write(control());
-    soc.flush();
+    //mutex.lock();
+    soc->waitForBytesWritten(10);
+    soc->write(control());
+    soc->flush();
+    //mutex.unlock();
 }
+
+
+//********************************** SLOTS **********************************//
+
+void ClientControl::stop()
+{
+    STOP=true;
+}
+
+void ClientControl::socketDisconnected()
+{
+    disconnect();
+    STOP=true;
+}
+
+//********************************** DATA PROCESSING **********************************//
 
 QByteArray ClientControl::control()
 {
@@ -113,7 +150,32 @@ QByteArray ClientControl::control()
     return toSend;
 }
 
-quint16 ClientControl::Crc16(QByteArray* byteArray, int pos){
+QByteArray ClientControl::control(int leftspeed,int rightspeed, int leftflag, int rightflag)
+{
+    QByteArray toSend;
+    int char7=0;
+    toSend.clear();
+    toSend.clear();
+    toSend.append((char)0xff);
+    toSend.append((char)0x07);
+    toSend.append((char)leftspeed);
+    toSend.append((char)0);
+    toSend.append((char)rightspeed);
+    toSend.append((char)0);
+    char7+=128*0;
+    char7+=64*leftflag;
+    char7+=32*0;
+    char7+=16*rightflag;
+    char7+=8*0;
+    toSend.append((char)char7);
+    quint16 crc = Crc16( &toSend, 1);
+    toSend.append((char)crc);
+    toSend.append((char)(crc>>8));
+    return toSend;
+}
+
+quint16 ClientControl::Crc16(QByteArray* byteArray, int pos)
+{
     unsigned char *data = (unsigned char* )byteArray->constData();
     quint16 crc = 0xFFFF;
     quint16 Polynome = 0xA001;
@@ -188,29 +250,8 @@ void ClientControl::receive(QByteArray data)
 
 }
 
-//************** SLOTS **************//
 
-void ClientControl::dataWrite()
-{
-    if(soc.open(QIODevice::ReadWrite))
-    {
-        send();
-    }
-}
-void ClientControl::dataRead()
-{
-    if(soc.open(QIODevice::ReadWrite))
-    {
-        QByteArray data;
-        soc.waitForReadyRead(100);
-        if(soc.bytesAvailable()>=21)
-        {
-            data=soc.read(21);
-            receive(data);
-        }
-    }
-}
-//************** SET GET **************//
+//********************************** SET GET **********************************//
 
 void ClientControl::setRightSpeed(unsigned char speed)
 {

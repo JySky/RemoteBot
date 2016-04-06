@@ -24,10 +24,16 @@ ClientCamera::ClientCamera(Interface *inter)
     position =new Poscam;
     position->x=0;
     position->y=0;
-    fisrtframe=true;
-    QObject::connect(this, SIGNAL(connected()),MainInter, SLOT(camConnected()));
-    QObject::connect(this, SIGNAL(disconnected()),MainInter, SLOT(camDisconnected()));
+    STOP=false;
+    bImshowcreated=false;
+    bImshow=false;
+    imgProcess=false;
+    imgProcesscreated=false;
+    QObject::connect(this, SIGNAL(connected()),MainInter, SLOT(camConnected()), Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(disconnected()),MainInter, SLOT(camDisconnected()), Qt::DirectConnection);
     QObject::connect(this, SIGNAL(streamStopped()),MainInter, SLOT(camStreamState()));
+    QObject::connect(this, SIGNAL(frameStream(QImage)),MainInter, SLOT(setFrame(QImage)));
+
 }
 
 ClientCamera::~ClientCamera()
@@ -35,57 +41,61 @@ ClientCamera::~ClientCamera()
 
 }
 
-void ClientCamera::processing()
+//********************************** THREAD MANAGEMENT **********************************//
+void ClientCamera::run()
 {
-    timer.setInterval(40);
-    QObject::connect(&timer, SIGNAL (timeout()), this, SLOT (getImageVStream()));
-    timer.start();
+    connect();
+    STOP=false;
+    if(connectedState)
+    {
+        while(!STOP)
+        {
+            mutex.lock();
+            getImageVStream();
+            mutex.unlock();
+        }
+    }
 }
 
+//**********************************SLOTS **********************************//
 void ClientCamera::disconnect()
 {
-    timer.stop();
+    STOP=true;
     emit disconnected();
-    MainInter->setImage(":/image/image/nosignal.png");
     connectedState=false;
-    if(!connectedState)
-    {
-        std::string s ="Disconnected from"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
-        const char* msg=s.c_str();
-        QMessageBox::information(
-              MainInter,
-              tr("Camera"),
-              tr(msg) );
-    }
 }
 
 void ClientCamera::connect()
 {
-    manager.connectToHost(IP,port);
+    manager=new QNetworkAccessManager();
+    manager->connectToHost(IP,port);
 
-    if(!manager.networkAccessible())
+    if(!manager->networkAccessible())
     {
         connectedState=false;
+        emit notConnected();
     }
     else
     {
         connectedState=true;
-        MainInter->setImage("");
         emit connected();
         initCam();
         openImageVStream();
-        processing();
     }
+}
 
-    if(!connectedState)
-    {
-        std::string s ="Not connected to"+IP.toStdString()+"/"+(QString::number(port)).toStdString();
-        const char* msg=s.c_str();
-        QMessageBox::critical(
-              MainInter,
-              tr("Camera"),
-              tr(msg) );
-    }
+void ClientCamera::stop()
+{
+    STOP=true;
+}
+void ClientCamera::startImgProcess()
+{
+    imgProcess=true;
+}
+
+void ClientCamera::stopImgProcess()
+{
+    imgProcess=false;
 }
 
 //********************************** CAMERA MOVE **********************************//
@@ -160,11 +170,10 @@ void ClientCamera::urlAccess(QString url)
 {
     if(connectedState)
     {
-        QNetworkAccessManager* mng = new QNetworkAccessManager(this);
-        QNetworkRequest request;
-        request.setUrl(QUrl(url));
-        QNetworkReply *reply =mng->get(request);
+        QNetworkAccessManager mng;
+        QNetworkReply *reply =mng.get(QNetworkRequest(url));
         //mng->clearAccessCache();
+        //reply =manager->get(QNetworkRequest(url));
     }
 }
 
@@ -185,9 +194,6 @@ bool ClientCamera::urlAccessState(QString url)
 
 
 //********************************** SET GET **********************************//
-
-
-
 void ClientCamera::setIp(QString i)
 {
     IP = i;
@@ -239,20 +245,84 @@ void ClientCamera::openImageVStream()
 
 void ClientCamera::getImageVStream()
 {
+    Mat resFrame;
     if(!vcap.read(frame))
     {
         qDebug() << "No frame";
     }
-    Mat gray;
+
+    if(imgProcess)
+    {
+        //mutex.lock();
+        imgProcesscreated=true;
+        imageProcessing(true);
+        //mutex.unlock();
+    }else
+    {
+        imageProcessing(false);
+        imgProcesscreated=false;
+    }
+    if(bImshow)
+    {
+        cvNamedWindow("video", 0 );
+
+        bImshowcreated=true;
+        imshow("video", frame );
+        waitKey(1);
+    }
+    else if (bImshowcreated)
+    {
+        cvDestroyWindow( "video" );
+        bImshowcreated=false;
+    }
+
+   /* Mat gray;
     Mat blu;
     cvtColor(frame,gray,CV_BGR2GRAY);
-    blur(gray,blu,Size(3,3));
+    blur(gray,blu,Size(3,3));*/
 
-    imshow("res2", blu);
+    /*imshow("res2", blu);
     imshow( "result", frame );
-    waitKey(1);
+    waitKey(1);*/
 
-    MainInter->setImage(getQImageFromFrame(frame));
+    emit frameStream(getQImageFromFrame(frame));
+}
+
+void ClientCamera::imageProcessing(bool i)
+{
+    if(i)
+    {
+        /*Mat gray;
+        Mat blu;
+        cvtColor(frame,gray,CV_BGR2GRAY);
+        blur(gray,blu,Size(3,3));
+
+
+        blur( src_gray, detected_edges, Size(3,3) );*/
+        dst.create( frame.size(), frame.type() );
+        cvtColor( frame, src_gray, CV_BGR2GRAY );
+        /// Canny detector
+        Canny( detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size );
+
+        /// Using Canny's output as a mask, we display our result
+        dst = Scalar::all(0);
+
+        src.copyTo( dst, detected_edges);
+        cvNamedWindow("res2", CV_WINDOW_AUTOSIZE );
+        /// Create a Trackbar for user to enter threshold
+        createTrackbar( "Min Threshold:", "res2", &lowThreshold, max_lowThreshold);
+
+
+        //("res2", blu);
+        //imshow( "res2", detected_edges );
+
+
+        waitKey(1);
+    }
+    else if(imgProcesscreated &&!i)
+    {
+        cvDestroyWindow( "res2" );
+    }
 }
 
 QImage ClientCamera::getQImageFromFrame(Mat f)
@@ -264,4 +334,59 @@ QImage ClientCamera::getQImageFromFrame(Mat f)
     QImage small = jpgImage->scaled(391, 291,Qt::KeepAspectRatio);
 
     return small;
+}
+
+QImage ClientCamera::cvMatToQImage(Mat inMat )
+{
+    switch ( inMat.type() )
+    {
+        // 8-bit, 4 channel
+        case CV_8UC4:
+        {
+            QImage image( inMat.data, inMat.cols, inMat.rows, inMat.step, QImage::Format_RGB32 );
+            return image;
+        }
+
+        // 8-bit, 3 channel
+        case CV_8UC3:
+        {
+            QImage image( inMat.data, inMat.cols, inMat.rows, inMat.step, QImage::Format_RGB888 );
+            return image.rgbSwapped();
+        }
+
+        // 8-bit, 1 channel
+        case CV_8UC1:
+        {
+            static QVector<QRgb>  sColorTable;
+            // only create our color table once
+            if ( sColorTable.isEmpty() )
+            {
+                for ( int i = 0; i < 256; ++i )
+                    sColorTable.push_back( qRgb( i, i, i ) );
+            }
+            QImage image( inMat.data, inMat.cols, inMat.rows, inMat.step, QImage::Format_Indexed8 );
+            image.setColorTable( sColorTable );
+            return image;
+        }
+
+        default:
+            qWarning() << "ASM::cvMatToQImage() - cv::Mat image type not handled in switch:" << inMat.type();
+            break;
+    }
+
+    return QImage();
+}
+
+QPixmap ClientCamera::cvMatToQPixmap( const Mat &inMat )
+{
+    return QPixmap::fromImage( cvMatToQImage( inMat ) );
+}
+
+void ClientCamera::openImshow()
+{
+    bImshow=true;
+}
+void ClientCamera::closeImshow()
+{
+    bImshow=false;
 }

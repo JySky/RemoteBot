@@ -11,17 +11,20 @@
 #include <QInputDialog>
 #include <QIcon>
 #include <QString>
+#include <QThread>
+#include <QMutex>
 
 class Interface;
 
-class ClientControl: public QObject
+class ClientControl : public QThread
 {
     Q_OBJECT
 
     private:
+        QMutex mutex;
         QString IP;
         int port;
-        QTcpSocket soc;
+        QTcpSocket *soc;
         QTimer timer,timer2;
         bool connectedState;
         unsigned char rightSpeed;
@@ -34,24 +37,28 @@ class ClientControl: public QObject
         static ClientControl* m_instance;
         ClientControl(Interface *inter);
         QByteArray control();
+        QByteArray control(int leftspeed,int rightspeed, int leftflag, int rightflag);
         void receive(QByteArray data);
         quint16 Crc16(QByteArray* byteArray, int pos);
         void send();
-        void processing();
-        void stopProcessing();
         void receive();
         void init();
-        ~ClientControl();
-
-    private slots:
+        bool STOP;
         void dataWrite();
         void dataRead();
-        void disconnect();
         void connect();
+        void disconnect();
+        ~ClientControl();
+
+    public slots:
+        void stop();
+
+        void socketDisconnected();
 
     signals:
         void connected();
         void disconnected();
+        void socNotConnected();
 
     public:
         static ClientControl* getInstance(){return m_instance;}
@@ -63,6 +70,7 @@ class ClientControl: public QObject
             }
             return m_instance;
         }
+        void run();
         void setRightSpeed(unsigned char speed);
         void setLeftSpeed(unsigned char speed);
         void setRightSpeedFlag(unsigned char flag);

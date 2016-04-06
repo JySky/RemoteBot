@@ -109,7 +109,7 @@
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">QLabel { background-color : black; color : green; }</string>
+     <string notr="true">QLabel { background-color : black; color : rgb(3,255,45); }</string>
     </property>
     <property name="text">
      <string>NO SIGNAL</string>
@@ -118,7 +118,7 @@
      <enum>Qt::RichText</enum>
     </property>
     <property name="scaledContents">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -735,7 +735,7 @@
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">QLabel {color : green; }</string>
+     <string notr="true">QLabel {color : rgb(3,255,45); }</string>
     </property>
     <property name="text">
      <string>0</string>
@@ -762,7 +762,7 @@
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">QLabel {color : green; }</string>
+     <string notr="true">QLabel {color : rgb(3,255,45); }</string>
     </property>
     <property name="text">
      <string>0</string>
@@ -789,7 +789,7 @@
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">QLabel {color : green; }</string>
+     <string notr="true">QLabel {color : rgb(3,255,45); }</string>
     </property>
     <property name="text">
      <string>0</string>
@@ -816,7 +816,7 @@
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">QLabel {color : green; }</string>
+     <string notr="true">QLabel {color : rgb(3,255,45); }</string>
     </property>
     <property name="text">
      <string>0</string>
@@ -987,7 +987,7 @@
      <addaction name="actionActiver_Traitement_Image"/>
      <addaction name="actionActiver_Manette"/>
      <addaction name="actionCamera_Automatique"/>
-     <addaction name="actionOuvrir_image_dans_une_fen_tre_OpenCV"/>
+     <addaction name="actionImshow_OpenCV"/>
     </widget>
     <addaction name="actionPort_et_IP"/>
     <addaction name="menuOption"/>
@@ -1054,9 +1054,12 @@
     <string>Vitesse camera</string>
    </property>
   </action>
-  <action name="actionOuvrir_image_dans_une_fen_tre_OpenCV">
+  <action name="actionImshow_OpenCV">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Ouvrir le flux dans une fenêtre OpenCV</string>
+    <string>Imshow OpenCV</string>
    </property>
   </action>
  </widget>

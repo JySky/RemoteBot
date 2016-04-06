@@ -17,7 +17,13 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio.hpp>
-#include <QTimer>
+#include <opencv2/imgproc/types_c.h>
+#include <QThread>
+#include <QMutex>
+#include <QImage>
+#include <QPixmap>
+#include <QtNetwork/QHttpPart>
+
 
 class Interface;
 
@@ -28,26 +34,30 @@ struct Poscam
 };
 
 using namespace cv;
-class ClientCamera: public QObject
+
+class ClientCamera: public QThread
 {
     Q_OBJECT
 
     private:
-
+        QMutex mutex;
+        bool STOP;
         IplImage* crt;
         IplImage* prev;
         IplImage* output;
-        QTimer timer;
         VideoCapture vcap;
         Mat frame;
-        Mat prevFrame;
         QString IP;
         QTcpSocket soc;
-        QNetworkAccessManager manager;
+        QNetworkAccessManager *manager;
+        QNetworkReply *reply;
         int port;
         bool connectedState;
-        bool fisrtframe;
         bool camAuto;
+        bool imgProcess;
+        bool bImshow;
+        bool bImshowcreated;
+        bool imgProcesscreated;
         static const int camV;
         static const int camMaxUp;
         static const int camMaxDown;
@@ -75,16 +85,37 @@ class ClientCamera: public QObject
         void processing();
         void openImageVStream();
         QImage getQImageFromFrame(Mat f);
-
-    private slots:
-        void disconnect();
         void connect();
         void getImageVStream();
+        void imageProcessing(bool i);
+        QImage cvMatToQImage(Mat inMat );
+        QPixmap cvMatToQPixmap( const Mat &inMat );
+
+
+
+        Mat src, src_gray;
+        Mat dst, detected_edges;
+
+        int edgeThresh = 1;
+        int lowThreshold;
+        int const max_lowThreshold = 100;
+        int ratio = 3;
+        int kernel_size = 3;
+
+    public slots:
+        void disconnect();
+        void openImshow();
+        void closeImshow();
+        void startImgProcess();
+        void stopImgProcess();
+        void stop();
 
     signals:
+        void notConnected();
         void disconnected();
         void connected();
         void streamStopped();
+        void frameStream(QImage);
 
     public:
         static ClientCamera* getInstance(Interface* inter)
@@ -95,7 +126,7 @@ class ClientCamera: public QObject
             }
             return m_instance;
         }
-
+        void run();
         void setIp(QString i);
         void setPort(int p);
         QString getIp(){return IP;}
