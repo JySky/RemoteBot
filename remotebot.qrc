@@ -25,5 +25,7 @@
         <file>image/batteryLow.png</file>
         <file>RemoteBot.ico</file>
         <file>image/current.png</file>
+        <file>image/connectwarningcamera.png</file>
+        <file>image/connectwarningrobot.png</file>
     </qresource>
 </RCC>

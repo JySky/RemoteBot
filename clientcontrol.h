@@ -16,17 +16,27 @@
 
 class Interface;
 
+using namespace std;
+
 class ClientControl : public QThread
 {
     Q_OBJECT
 
     private:
+
+        long odoL,odoR;
+        int speedL,speedR;
+        quint8 battery;
+        int ir1,ir2,ir3,ir4,current,version;
+        ClientControl(QObject *parent,Interface *inter);
         QMutex mutex;
-        QString IP;
-        int port;
+        static QString IP;
+        static int port;
         QTcpSocket *soc;
         QTimer timer,timer2;
         bool connectedState;
+        bool frontCollision;
+        bool rearCollision;
         unsigned char rightSpeed;
         unsigned char leftSpeed;
         unsigned char leftSpeedLoop;
@@ -35,7 +45,6 @@ class ClientControl : public QThread
         unsigned char leftSpeedFlag;
         Interface* MainInter;
         static ClientControl* m_instance;
-        ClientControl(Interface *inter);
         QByteArray control();
         QByteArray control(int leftspeed,int rightspeed, int leftflag, int rightflag);
         void receive(QByteArray data);
@@ -52,40 +61,55 @@ class ClientControl : public QThread
 
     public slots:
         void stop();
-
+        void robotStart();
         void socketDisconnected();
+        void setIP(QString IP);
+        void setPort(int Port);
+        void getIP();
+        void getPort();
+        void setRightSpeed(unsigned char speed);
+        void setLeftSpeed(unsigned char speed);
+        void setRightSpeedFlag(unsigned char flag);
+        void setLeftSpeedFlag(unsigned char flag);
+
+        void frontCollisionOn();
+        void frontCollisionOff();
+        void rearCollisionOn();
+        void rearCollisionOff();
 
     signals:
         void connected();
         void disconnected();
         void socNotConnected();
 
+        void BatLevel(int);
+        void VitLeft(int);
+        void VitRight(int);
+        void IR1(int);
+        void IR2(int);
+        void IR3(int);
+        void IR4(int);
+        void Version(int);
+        void Current(int);
+        void ODOL(long);
+        void ODOR(long);
+        void sendIP(QString);
+        void sendPort(int);
+
+
+
     public:
         static ClientControl* getInstance(){return m_instance;}
-        static ClientControl* getInstance(Interface* inter)
+        static ClientControl* getInstance(QObject* parent,Interface* inter)
         {
             if ( m_instance == NULL )
             {
-                m_instance = new ClientControl(inter);
+                m_instance = new ClientControl(parent,inter);
             }
             return m_instance;
         }
         void run();
-        void setRightSpeed(unsigned char speed);
-        void setLeftSpeed(unsigned char speed);
-        void setRightSpeedFlag(unsigned char flag);
-        void setLeftSpeedFlag(unsigned char flag);
-        void setIp(QString i);
-        void setPort(int p);
-        unsigned char getLeftSpeedFlag(){return leftSpeedFlag;}
-        unsigned char getRightSpeedFlag(){return rightSpeedFlag;}
-        unsigned char getLeftSpeedLoop(){return leftSpeedLoop;}
-        unsigned char getRightSpeedLoop(){return rightSpeedLoop;}
-        unsigned char getRightSpeed(){return rightSpeed;}
-        unsigned char getLeftSpeed(){return leftSpeed;}
-        unsigned char getConnected(){return connectedState;}
-        QString getIp(){return IP;}
-        int getPort(){return port;}
+
 };
 
 #endif // CLIENTCONTROL_H

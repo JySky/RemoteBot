@@ -2,67 +2,105 @@
 #include <QDebug>
 
 ClientCamera* ClientCamera::m_instance = NULL;
+int ClientCamera::port=8080;
+QString ClientCamera::IP="192.168.1.106";
 const int ClientCamera::camV=2;
-const int ClientCamera::camMaxUp=51;
-const int ClientCamera::camMaxDown=-51;
-const int ClientCamera::camMaxLeft=94;
-const int ClientCamera::camMaxRight=-94;
+const int ClientCamera::camMaxUp=45;
+const int ClientCamera::camMaxDown=-45;
+const int ClientCamera::camMaxLeft=80;
+const int ClientCamera::camMaxRight=-80;
 const int ClientCamera::setVitesseEnable=1;
 const int ClientCamera::setVitesseDisable=0;
+const int ClientCamera::horizontalRatio=58;
+const int ClientCamera::verticalRatio=29;
 
-using namespace std;
+/*const int ClientCamera::SENSITIVITY_VALUE = 20;
+const int ClientCamera::BLUR_SIZE = 10;
+int theObject[2] = {0,0};
+Rect objectBoundingRectangle = Rect(0,0,0,0);*/
+const float ClientCamera::MHI_DURATION = 0.05;
+const int ClientCamera::DEFAULT_THRESHOLD = 32;
+const float ClientCamera::MAX_TIME_DELTA = 12500.0;
+const float ClientCamera::MIN_TIME_DELTA = 5;
+const int ClientCamera::visual_trackbar = 2;
 
-ClientCamera::ClientCamera(Interface *inter)
+//********************************** CONSTRUCTOR **********************************//
+
+ClientCamera::ClientCamera(QObject *parent,Interface *inter) :
+    QThread(parent)
 {
     MainInter=inter;
-    port=8080;
-    IP="192.168.1.106";
+    QObject::connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+    QObject::connect(this, SIGNAL(connected()),MainInter, SLOT(camConnected()), Qt::QueuedConnection);
+    QObject::connect(this, SIGNAL(disconnected()),MainInter, SLOT(camDisconnected()), Qt::QueuedConnection);
+    //QObject::connect(this, SIGNAL(streamStopped()),MainInter, SLOT(camStreamState()), Qt::QueuedConnection);
+    //QObject::connect(this, SIGNAL(frameStream(QImage)),MainInter, SLOT(setFrame(QImage)), Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(frameStream(QImage)),MainInter, SLOT(setFrame(QImage)), Qt::QueuedConnection);
+    QObject::connect(this, SIGNAL(requestSliderCamValue()),MainInter, SLOT(getSliderCamValue()), Qt::QueuedConnection);
+    init();
+    //edgeThresh = 1;
+}
+
+ClientCamera::~ClientCamera()
+{
+    m_instance=NULL;
+}
+void ClientCamera::init()
+{
     connectedState=false;
     camAuto=false;
+    manager=NULL;
     reset ="/?action=command&dest=0&plugin=0&id=168062211&group=1&value=3";
     url=QString("http://"+IP+":"+QString::number(port));
     position =new Poscam;
     position->x=0;
     position->y=0;
+    sliderCamValue=40;
     STOP=false;
     bImshowcreated=false;
     bImshow=false;
     imgProcess=false;
     imgProcesscreated=false;
-    QObject::connect(this, SIGNAL(connected()),MainInter, SLOT(camConnected()), Qt::DirectConnection);
-    QObject::connect(this, SIGNAL(disconnected()),MainInter, SLOT(camDisconnected()), Qt::DirectConnection);
-    QObject::connect(this, SIGNAL(streamStopped()),MainInter, SLOT(camStreamState()));
-    QObject::connect(this, SIGNAL(frameStream(QImage)),MainInter, SLOT(setFrame(QImage)));
-
-}
-
-ClientCamera::~ClientCamera()
-{
-
+    frame2=Mat(1,1, CV_64F, cvScalar(0.));
 }
 
 //********************************** THREAD MANAGEMENT **********************************//
 void ClientCamera::run()
 {
     connect();
+    //msleep(1000);
     STOP=false;
     if(connectedState)
     {
         while(!STOP)
         {
-            mutex.lock();
+            //mutex.lock();
             getImageVStream();
-            mutex.unlock();
+            //mutex.unlock();
+            msleep(25);
         }
     }
+    vcap.release();
+    m_instance=NULL;
 }
 
 //**********************************SLOTS **********************************//
+void ClientCamera::receiveSliderCamValue(int val)
+{
+    sliderCamValue=val;
+}
+
+
 void ClientCamera::disconnect()
 {
     STOP=true;
     emit disconnected();
     connectedState=false;
+}
+
+void ClientCamera::cameraStart()
+{
+    this->start();
 }
 
 void ClientCamera::connect()
@@ -98,83 +136,115 @@ void ClientCamera::stopImgProcess()
     imgProcess=false;
 }
 
+void ClientCamera::setIP(QString IP)
+{
+    if(!connectedState)
+    {
+        mutex.lock();
+            this->IP=IP;
+        mutex.unlock();
+    }
+}
+
+void ClientCamera::setPort(int Port)
+{
+    if(!connectedState)
+    {
+        mutex.lock();
+            this->port=Port;
+        mutex.unlock();
+    }
+}
+void ClientCamera::getIP()
+{
+    mutex.lock();
+        emit sendIP(this->IP);
+    mutex.unlock();
+}
+
+void ClientCamera::getPort()
+{
+    mutex.lock();
+        emit sendPort(this->port);
+    mutex.unlock();
+}
+
 //********************************** CAMERA MOVE **********************************//
 
 void ClientCamera::initCam()
 {
+    manager=new QNetworkAccessManager();
     moveCam(9);
 }
 
 void ClientCamera::moveCam(int pos)
 {
-    setVitesseVar();
-    switch(pos)
+    if(connectedState)
     {
-        case 1://UP
-            urlAccess(QString(url+up));
-            position->y+=3*camV;
-        break;
+        setVitesseVar();
+        emit requestSliderCamValue();
+        switch(pos)
+        {
+            case 1://UP
+                urlAccess(QString(url+up));
+                position->y+=(sliderCamValue*camV)/verticalRatio;
+            break;
 
-        case 2://DOWN
-            urlAccess(QString(url+down));
-            position->y-=3*camV;
-        break;
+            case 2://DOWN
+                urlAccess(QString(url+down));
+                position->y-=(sliderCamValue*camV)/verticalRatio;
+            break;
 
-        case 3://LEFT
-            urlAccess(QString(url+left));
-            position->x+=5*camV;
-        break;
+            case 3://LEFT
+                urlAccess(QString(url+left));
+                position->x+=(sliderCamValue*camV)/horizontalRatio;
+            break;
 
-        case 4://RIGHT
-            urlAccess(QString(url+right));
-            position->x-=5*camV;
-        break;
+            case 4://RIGHT
+                urlAccess(QString(url+right));
+                position->x-=(sliderCamValue*camV)/horizontalRatio;
+            break;
 
-        case 5://UP RIGHT
-            urlAccess(QString(url+up));
-            urlAccess(QString(url+right));
-            position->x-=5*camV;
-            position->y+=3*camV;
-        break;
+            case 5://UP RIGHT
+                urlAccess(QString(url+up));
+                urlAccess(QString(url+right));
+                position->x-=(sliderCamValue*camV)/horizontalRatio;
+                position->y+=(sliderCamValue*camV)/verticalRatio;
+            break;
 
-        case 6://UP LEFT
-            urlAccess(QString(url+up));
-            urlAccess(QString(url+left));
-            position->x+=5*camV;
-            position->y+=3*camV;
-        break;
+            case 6://UP LEFT
+                urlAccess(QString(url+up));
+                urlAccess(QString(url+left));
+                position->x+=(sliderCamValue*camV)/horizontalRatio;
+                position->y+=(sliderCamValue*camV)/verticalRatio;
+            break;
 
-        case 7://DOWN LEFT
-            urlAccess(QString(url+down));
-            urlAccess(QString(url+left));
-            position->x+=5*camV;
-            position->y-=3*camV;
-        break;
+            case 7://DOWN LEFT
+                urlAccess(QString(url+down));
+                urlAccess(QString(url+left));
+                position->x+=(sliderCamValue*camV)/horizontalRatio;
+                position->y-=(sliderCamValue*camV)/verticalRatio;
+            break;
 
-        case 8://DOWN RIGHT
-            urlAccess(QString(url+down));
-            urlAccess(QString(url+right));
-            position->x-=5*camV;
-            position->y-=3*camV;
-        break;
+            case 8://DOWN RIGHT
+                urlAccess(QString(url+down));
+                urlAccess(QString(url+right));
+                position->x-=(sliderCamValue*camV)/horizontalRatio;
+                position->y-=(sliderCamValue*camV)/verticalRatio;
+            break;
 
-        case 9://RESET
-            urlAccess(QString(url+reset));
-            position->x=0;
-            position->y=0;
-        break;
+            case 9://RESET
+                urlAccess(QString(url+reset));
+                position->x=0;
+                position->y=0;
+            break;
+        }
     }
 }
 
 void ClientCamera::urlAccess(QString url)
 {
-    if(connectedState)
-    {
-        QNetworkAccessManager mng;
-        QNetworkReply *reply =mng.get(QNetworkRequest(url));
-        //mng->clearAccessCache();
-        //reply =manager->get(QNetworkRequest(url));
-    }
+    manager->get(QNetworkRequest(url));
 }
 
 bool ClientCamera::urlAccessState(QString url)
@@ -183,8 +253,7 @@ bool ClientCamera::urlAccessState(QString url)
     QNetworkAccessManager* mng = new QNetworkAccessManager();
     QNetworkRequest request;
     request.setUrl(QUrl(url));
-    QNetworkReply *reply =mng->get(request);//QNetworkReply *reply =
-    //mng->clearAccessCache();
+    QNetworkReply *reply =mng->get(request);
     if(reply!=NULL)
     {
         res=true;
@@ -194,17 +263,6 @@ bool ClientCamera::urlAccessState(QString url)
 
 
 //********************************** SET GET **********************************//
-void ClientCamera::setIp(QString i)
-{
-    IP = i;
-    setUrlInit();
-}
-
-void ClientCamera::setPort(int p)
-{
-    port = p;
-    setUrlInit();
-}
 
 void  ClientCamera::setUrlInit()
 {
@@ -215,19 +273,22 @@ void ClientCamera::setVitesseVar()
 {
     int valx = setVitesseEnable;
     int valy = setVitesseEnable;
-
-    if((position->x>camMaxUp) || ((position->x+(MainInter->getSliderCam()*camV))>camMaxUp)||(position->x<camMaxDown) || ((position->x+(MainInter->getSliderCam()*(-camV)))<camMaxDown))
+    emit requestSliderCamValue();
+    if((position->x>camMaxUp) || (((position->x+(sliderCamValue*camV))/horizontalRatio)>camMaxUp)||(position->x<camMaxDown) || (((position->x-(sliderCamValue*camV))/horizontalRatio)<camMaxDown))
     {
         valx=setVitesseDisable;
     }
-    else if((position->y>camMaxLeft) || ((position->y+(MainInter->getSliderCam()*camV))>camMaxLeft)||(position->y<camMaxRight) || ((position->y+(MainInter->getSliderCam()*(-camV)))<camMaxRight))
+    else if((position->y>camMaxLeft) || (((position->y+(sliderCamValue*camV))/verticalRatio)>camMaxLeft)||(position->y<camMaxRight) || (((position->y-(sliderCamValue*camV))/verticalRatio)<camMaxRight))
     {
         valy=setVitesseDisable;
     }
-    left = QString("/?action=command&dest=0&plugin=0&id=10094852&group=1&value="+QString::number((MainInter->getSliderCam()*camV*valx)));
-    right = QString("/?action=command&dest=0&plugin=0&id=10094852&group=1&value="+QString::number((MainInter->getSliderCam()*(-camV)*valx)));
-    down = QString("/?action=command&dest=0&plugin=0&id=10094853&group=1&value="+QString::number((MainInter->getSliderCam()*camV*valy)));
-    up = QString("/?action=command&dest=0&plugin=0&id=10094853&group=1&value="+QString::number((MainInter->getSliderCam()*(-camV)*valy)));
+
+    //value horizontal 58->1°  189
+    //value vertical 29->1°  109
+    left = QString("/?action=command&dest=0&plugin=0&id=10094852&group=1&value="+QString::number((sliderCamValue*camV*valx)));
+    right = QString("/?action=command&dest=0&plugin=0&id=10094852&group=1&value="+QString::number((sliderCamValue*(-camV)*valx)));
+    down = QString("/?action=command&dest=0&plugin=0&id=10094853&group=1&value="+QString::number((sliderCamValue*camV*valy)));
+    up = QString("/?action=command&dest=0&plugin=0&id=10094853&group=1&value="+QString::number((sliderCamValue*(-camV)*valy)));
 }
 
 
@@ -236,150 +297,161 @@ void ClientCamera::setVitesseVar()
 void ClientCamera::openImageVStream()
 {
     url=QString("http://"+IP+":"+QString::number(port));
-    videoStreamAddress=url+"/cameras/1?q=3";//"/javascript_simple.html";/cameras/1?q=30 /?action=snapshot&n=7 /?action=stream
+    videoStreamAddress=url+"/cameras/1?q=30";///?action=stream";//"/javascript_simple.html";/cameras/1?q=30 /?action=snapshot&n=7 /?action=stream
     if(!vcap.open(videoStreamAddress.toStdString()))
     {
         qDebug() << "Error opening video stream or file";
+        STOP=true;
     }
 }
 
 void ClientCamera::getImageVStream()
 {
     Mat resFrame;
+    //msleep(1000);
     if(!vcap.read(frame))
     {
         qDebug() << "No frame";
+        STOP=true;
     }
-
-    if(imgProcess)
+    if(!STOP)
     {
-        //mutex.lock();
-        imgProcesscreated=true;
-        imageProcessing(true);
-        //mutex.unlock();
-    }else
-    {
-        imageProcessing(false);
-        imgProcesscreated=false;
+        resFrame=frame;
+        frame1=resFrame;
+        if(imgProcess)
+        {
+            imgProcesscreated=true;
+            imageProcessing(true);
+        }else
+        {
+            imageProcessing(false);
+            imgProcesscreated=false;
+        }
+        if(bImshow)
+        {
+            cvNamedWindow("video", 0 );
+            bImshowcreated=true;
+            imshow("video", frame );
+            waitKey(1);
+        }
+        else if (bImshowcreated)
+        {
+            cvDestroyWindow( "video" );
+            bImshowcreated=false;
+        }
+        frame2=resFrame;
+        emit frameStream(getQImageFromFrame(resFrame));
     }
-    if(bImshow)
-    {
-        cvNamedWindow("video", 0 );
-
-        bImshowcreated=true;
-        imshow("video", frame );
-        waitKey(1);
-    }
-    else if (bImshowcreated)
-    {
-        cvDestroyWindow( "video" );
-        bImshowcreated=false;
-    }
-
-   /* Mat gray;
-    Mat blu;
-    cvtColor(frame,gray,CV_BGR2GRAY);
-    blur(gray,blu,Size(3,3));*/
-
-    /*imshow("res2", blu);
-    imshow( "result", frame );
-    waitKey(1);*/
-
-    emit frameStream(getQImageFromFrame(frame));
 }
 
 void ClientCamera::imageProcessing(bool i)
 {
     if(i)
     {
-        /*Mat gray;
-        Mat blu;
-        cvtColor(frame,gray,CV_BGR2GRAY);
-        blur(gray,blu,Size(3,3));
+        /*cedge.create(frame.size(), frame.type());
+        cvtColor(frame, gray, COLOR_BGR2GRAY);
+        blur(gray, edge, Size(3,3));
+        // Run the edge detector on grayscale
+        Canny(edge, edge, edgeThresh, edgeThresh*3, 3);
+        cedge = Scalar::all(0);
+        frame.copyTo(cedge, edge);
+        imshow("Edge map", cedge);
+        waitKey(1);*/
 
 
-        blur( src_gray, detected_edges, Size(3,3) );*/
-        dst.create( frame.size(), frame.type() );
-        cvtColor( frame, src_gray, CV_BGR2GRAY );
-        /// Canny detector
-        Canny( detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size );
-
-        /// Using Canny's output as a mask, we display our result
-        dst = Scalar::all(0);
-
-        src.copyTo( dst, detected_edges);
-        cvNamedWindow("res2", CV_WINDOW_AUTOSIZE );
-        /// Create a Trackbar for user to enter threshold
-        createTrackbar( "Min Threshold:", "res2", &lowThreshold, max_lowThreshold);
+        /*cvtColor(frame1,grayImage1,COLOR_BGR2GRAY);
+        cvtColor(frame2,grayImage2,COLOR_BGR2GRAY);
+        absdiff(grayImage1,grayImage2,differenceImage);
+        //threshold(differenceImage,thresholdImage,SENSITIVITY_VALUE,255,THRESH_BINARY);
+        blur(thresholdImage,thresholdImage,cv::Size(BLUR_SIZE,BLUR_SIZE));
+        //threshold(thresholdImage,thresholdImage,SENSITIVITY_VALUE,255,THRESH_BINARY);
+        cv::imshow("Difference Image",differenceImage);
+        cv::imshow("Threshold Image", thresholdImage);
+        searchForMovement(thresholdImage,frame1);
+        imshow("Motion Track", frame1);*/
 
 
-        //("res2", blu);
-        //imshow( "res2", detected_edges );
-
+        updateMotionHistory(motion_mask,motion_history,timestamp,MHI_DURATION);
+        calcMotionGradient(motion_history, mg_mask, mg_orient, 5, 12500.0, 3);
+        segmentMotion(motion_history, seg_mask, seg_bounds, timestamp, 32);
 
         waitKey(1);
     }
     else if(imgProcesscreated &&!i)
     {
-        cvDestroyWindow( "res2" );
+        cvDestroyWindow( "Motion Track" );
+        cvDestroyWindow( "Difference Image" );
+        cvDestroyWindow( "Threshold Image" );
     }
+}
+
+void ClientCamera::draw_motion_comp(Mat& img, int x_coordinate, int y_coordinate, int width, int height, double angle,Mat& result)
+{
+//	rectangle(img,Point(x_coordinate,y_coordinate), Point(x_coordinate+width,y_coordinate+width), Scalar(255,0,0), 1, 8, 0);
+    int r,cx,cy;
+    if(height/2 <= width/2)
+        r = height/2;
+    else
+        r = width/2;
+    cx = x_coordinate + width/2;
+    cy = y_coordinate + height/2;
+    angle = angle*M_PI/180;
+    circle(img, Point(cx,cy), r, Scalar(255,0,0),1, 8, 0);
+    line(img, Point(cx,cy), Point(int(cx+cos(angle)*r), int(cy+sin(angle)*r)), Scalar(255,0,0), 1, 8, 0);
+    result = img.clone();
+}
+string ClientCamera::intToString(int number)
+{
+    stringstream ss;
+    ss << number;
+    return ss.str();
+}
+
+void ClientCamera::searchForMovement(Mat thresholdImage, Mat &cameraFeed)
+{
+    /*bool objectDetected = false;
+    Mat temp;
+    thresholdImage.copyTo(temp);
+    vector< vector<Point> > contours;
+    vector<Vec4i> hierarchy;
+    //findContours(temp,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );// retrieves all contours
+    findContours(temp,contours,hierarchy,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE );// retrieves external contours
+    if(contours.size()>0)
+    {
+        objectDetected=true;
+        qDebug()<<"plop";
+    }
+    else
+    {
+        objectDetected = false;
+    }
+    if(objectDetected)
+    {
+        vector< vector<Point> > largestContourVec;
+        largestContourVec.push_back(contours.at(contours.size()-1));
+        objectBoundingRectangle = boundingRect(largestContourVec.at(0));
+        int xpos = objectBoundingRectangle.x+objectBoundingRectangle.width/2;
+        int ypos = objectBoundingRectangle.y+objectBoundingRectangle.height/2;
+        theObject[0] = xpos , theObject[1] = ypos;
+    }
+    int x = theObject[0];
+    int y = theObject[1];
+    circle(cameraFeed,Point(x,y),20,Scalar(0,255,0),2);
+    line(cameraFeed,Point(x,y),Point(x,y-25),Scalar(0,255,0),2);
+    line(cameraFeed,Point(x,y),Point(x,y+25),Scalar(0,255,0),2);
+    line(cameraFeed,Point(x,y),Point(x-25,y),Scalar(0,255,0),2);
+    line(cameraFeed,Point(x,y),Point(x+25,y),Scalar(0,255,0),2);
+    putText(cameraFeed,"Tracking object at (" + intToString(x)+","+intToString(y)+")",Point(x,y),1,1,Scalar(255,0,0),2);*/
 }
 
 QImage ClientCamera::getQImageFromFrame(Mat f)
 {
     cvtColor(f, f, CV_RGB2BGR);
 
-    QImage *jpgImage = new QImage((uchar*) (f.data), f.cols, f.rows, f.step, QImage::Format_RGB888);
+    /*QImage *jpgImage = new QImage((uchar*) (f.data), f.cols, f.rows, f.step, QImage::Format_RGB888);
+    QImage small = jpgImage->scaled(391, 291,Qt::KeepAspectRatio);*/
 
-    QImage small = jpgImage->scaled(391, 291,Qt::KeepAspectRatio);
-
-    return small;
-}
-
-QImage ClientCamera::cvMatToQImage(Mat inMat )
-{
-    switch ( inMat.type() )
-    {
-        // 8-bit, 4 channel
-        case CV_8UC4:
-        {
-            QImage image( inMat.data, inMat.cols, inMat.rows, inMat.step, QImage::Format_RGB32 );
-            return image;
-        }
-
-        // 8-bit, 3 channel
-        case CV_8UC3:
-        {
-            QImage image( inMat.data, inMat.cols, inMat.rows, inMat.step, QImage::Format_RGB888 );
-            return image.rgbSwapped();
-        }
-
-        // 8-bit, 1 channel
-        case CV_8UC1:
-        {
-            static QVector<QRgb>  sColorTable;
-            // only create our color table once
-            if ( sColorTable.isEmpty() )
-            {
-                for ( int i = 0; i < 256; ++i )
-                    sColorTable.push_back( qRgb( i, i, i ) );
-            }
-            QImage image( inMat.data, inMat.cols, inMat.rows, inMat.step, QImage::Format_Indexed8 );
-            image.setColorTable( sColorTable );
-            return image;
-        }
-
-        default:
-            qWarning() << "ASM::cvMatToQImage() - cv::Mat image type not handled in switch:" << inMat.type();
-            break;
-    }
-
-    return QImage();
-}
-
-QPixmap ClientCamera::cvMatToQPixmap( const Mat &inMat )
-{
-    return QPixmap::fromImage( cvMatToQImage( inMat ) );
+    return QImage((uchar*) (f.data), f.cols, f.rows, f.step, QImage::Format_RGB888);//small;
 }
 
 void ClientCamera::openImshow()

@@ -55,7 +55,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>110</y>
+     <y>100</y>
      <width>113</width>
      <height>20</height>
     </rect>
@@ -68,7 +68,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>140</y>
+     <y>130</y>
      <width>113</width>
      <height>20</height>
     </rect>
@@ -81,7 +81,7 @@
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>110</y>
+     <y>100</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -94,7 +94,7 @@
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>140</y>
+     <y>130</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -133,13 +133,26 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>210</y>
+     <y>190</y>
      <width>156</width>
      <height>23</height>
     </rect>
    </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>80</y>
+     <width>251</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
    </property>
   </widget>
  </widget>

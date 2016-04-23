@@ -22,21 +22,18 @@ SOURCES += main.cpp\
     config.cpp \
     clientcamera.cpp \
     clickablelabel.cpp \
-    about.cpp \
-    tutorial.cpp
+    about.cpp
 
 HEADERS  += interface.h \
     clientcontrol.h \
     config.h \
     clientcamera.h \
     clickablelabel.h \
-    about.h \
-    tutorial.h
+    about.h
 
 FORMS    += interface.ui \
     config.ui \
-    about.ui \
-    tutorial.ui
+    about.ui
 
 RESOURCES += \
     remotebot.qrc

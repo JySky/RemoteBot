@@ -17,6 +17,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio.hpp>
+#include <opencv2/video/tracking.hpp>
 #include <opencv2/imgproc/types_c.h>
 #include <QThread>
 #include <QMutex>
@@ -34,12 +35,14 @@ struct Poscam
 };
 
 using namespace cv;
+using namespace std;
 
 class ClientCamera: public QThread
 {
     Q_OBJECT
 
     private:
+        ClientCamera(QObject *parent,Interface *inter);
         QMutex mutex;
         bool STOP;
         IplImage* crt;
@@ -47,11 +50,10 @@ class ClientCamera: public QThread
         IplImage* output;
         VideoCapture vcap;
         Mat frame;
-        QString IP;
+        static QString IP;
         QTcpSocket soc;
         QNetworkAccessManager *manager;
-        QNetworkReply *reply;
-        int port;
+        static int port;
         bool connectedState;
         bool camAuto;
         bool imgProcess;
@@ -63,8 +65,10 @@ class ClientCamera: public QThread
         static const int camMaxDown;
         static const int camMaxLeft;
         static const int camMaxRight;
-        static const int  setVitesseEnable;
-        static const int  setVitesseDisable;
+        static const int setVitesseEnable;
+        static const int setVitesseDisable;
+        static const int horizontalRatio;
+        static const int verticalRatio;
         QString left;
         QString right;
         QString down;
@@ -74,10 +78,11 @@ class ClientCamera: public QThread
         QString videoStreamAddress;
         Poscam* position;
         Interface* MainInter;
+        int sliderCamValue;
         void initCam();
         void setVitesseVar();
         static ClientCamera* m_instance;
-        ClientCamera(Interface *inter);
+
         ~ClientCamera();
         void urlAccess(QString url);
         bool urlAccessState(QString url);
@@ -88,27 +93,41 @@ class ClientCamera: public QThread
         void connect();
         void getImageVStream();
         void imageProcessing(bool i);
-        QImage cvMatToQImage(Mat inMat );
-        QPixmap cvMatToQPixmap( const Mat &inMat );
+        void init();
 
+        const static float MHI_DURATION;
+        const static int DEFAULT_THRESHOLD;
+        const static float MAX_TIME_DELTA;
+        const static float MIN_TIME_DELTA;
+        const static int visual_trackbar;
+        void draw_motion_comp(Mat& img, int x_coordinate, int y_coordinate, int width, int height, double angle,Mat& result);
 
+        void searchForMovement(Mat thresholdImage, Mat &cameraFeed);
+        const static int BLUR_SIZE;
+        const static int SENSITIVITY_VALUE;
+        Mat frame1,frame2;
+        Mat grayImage1,grayImage2;
+        Mat differenceImage;
+        Mat thresholdImage;
+        string intToString(int number);
+        /*int edgeThresh;
+        Mat image, gray, edge, cedge;*/
 
-        Mat src, src_gray;
-        Mat dst, detected_edges;
-
-        int edgeThresh = 1;
-        int lowThreshold;
-        int const max_lowThreshold = 100;
-        int ratio = 3;
-        int kernel_size = 3;
 
     public slots:
+        void receiveSliderCamValue(int val);
+        void setIP(QString IP);
+        void setPort(int Port);
+        void getIP();
+        void getPort();
         void disconnect();
         void openImshow();
         void closeImshow();
         void startImgProcess();
         void stopImgProcess();
         void stop();
+        void cameraStart();
+        void moveCam(int pos);
 
     signals:
         void notConnected();
@@ -116,22 +135,23 @@ class ClientCamera: public QThread
         void connected();
         void streamStopped();
         void frameStream(QImage);
+        void sendIP(QString);
+        void sendPort(int);
+        void requestSliderCamValue();
+
 
     public:
-        static ClientCamera* getInstance(Interface* inter)
+
+        static ClientCamera* getInstance(){return m_instance;}
+        static ClientCamera* getInstance(QObject* parent, Interface* inter)
         {
             if ( m_instance == NULL )
             {
-                m_instance = new ClientCamera(inter);
+                m_instance = new ClientCamera(parent,inter);
             }
             return m_instance;
         }
         void run();
-        void setIp(QString i);
-        void setPort(int p);
-        QString getIp(){return IP;}
-        int getPort(){return port;}
-        void setCamAuto(bool c){camAuto=c;}
-        void moveCam(int pos);
+
 };
 #endif // CLIENTCAMERA_H

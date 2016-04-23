@@ -13,11 +13,12 @@
 #include <QString>
 #include <iostream>
 #include <about.h>
-#include <tutorial.h>
 #include <QThread>
+#include <QMutex>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <QtMath>
 
 namespace Ui {
     class Interface;
@@ -26,13 +27,13 @@ using namespace cv;
 class ClientControl;
 class ClientCamera;
 class About;
-class tutorial;
 
 class Interface : public QMainWindow
 {
         Q_OBJECT
 
         private:
+            QMutex mutex;
             QThread controlThread;
             Ui::Interface *ui;
             ClientControl *Clientcont;
@@ -51,9 +52,25 @@ class Interface : public QMainWindow
             bool controllerOn;
             bool camconnected;
             bool robotconnected;
+            int speedL;
+            int speedR;
+            int IR1;
+            int oldIR1;
+            int IR2;
+            int oldIR2;
+            int IR3;
+            int oldIR3;
+            int IR4;
+            int oldIR4;
+            long odoL;
+            long odoR;
+            void setVitesseGlobal();
             void ControlDirection();
             void ControlCam();
             void majConnectedState();
+            void initinterface();
+            void initConnect();
+            int computeDistance(float lvl, float oldLvl);
 
         protected:
             void keyPressEvent(QKeyEvent *event);
@@ -84,9 +101,7 @@ class Interface : public QMainWindow
             void on_actionQuitter_triggered();
             void on_actionActiver_Manette_changed();
             void on_actionActiver_Traitement_Image_changed();
-            void on_actionCamera_Automatique_changed();
-            void on_actionA_propos_triggered();
-            void on_actionTutoriel_triggered();
+            void a_propos();
             void on_actionImshow_OpenCV_changed();
 
         public:
@@ -96,7 +111,8 @@ class Interface : public QMainWindow
             void setcolorConnected(QString color);
             void setImage(QImage img);
             void setImage(QString img);
-            int getSliderCam();
+
+        public slots :
             void setBatLevel(int lvl);
             void setVitLeft(int lvl);
             void setVitRight(int lvl);
@@ -106,17 +122,20 @@ class Interface : public QMainWindow
             void setIR4(int lvl);
             void setVersion(int vers);
             void setCurrent(int curr);
-            void setAngle(int ang);
-
-        public slots :
+            void setOdoL(long odo);
+            void setOdoR(long odo);
             void camDisconnected();
             void camNotConnected();
-            void camStreamState();
             void camConnected();
             void robotDisconnected();
             void robotConnected();
             void robotNotConnected();
             void setFrame(QImage fr);
+            void getSliderCamValue();
+            void receiveIPCam(QString ipc);
+            void receivePortCam(int portc);
+            void receiveIPRobot(QString ipr);
+            void receivePortRobot(int portr);
 
         signals:
             void startImgProcessing();
@@ -127,7 +146,31 @@ class Interface : public QMainWindow
             void camDisconnect();
             void startImshow();
             void stopImshow();
+            void RightSpeed(unsigned char);
+            void LeftSpeed(unsigned char);
+            void RightSpeedFlag(unsigned char);
+            void LeftSpeedFlag(unsigned char);
+            void sendSliderCamValue(int);
 
+            void getIPCam();
+            void getPortCam();
+            void getIPRobot();
+            void getPortRobot();
+            void setIPCam(QString);
+            void setPortCam(int);
+            void setIPRobot(QString);
+            void setPortRobot(int);
+            void setConfigIPCam(QString);
+            void setConfigPortCam(int);
+            void setConfigIPRobot(QString);
+            void setConfigPortRobot(int);
+
+            void robotFrontCollisionOn();
+            void robotFrontCollisionOff();
+            void robotRearCollisionOn();
+            void robotRearCollisionOff();
+
+            void moveCamera(int);
 };
 
 #endif // INTERFACE_H
