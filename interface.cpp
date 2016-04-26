@@ -9,9 +9,12 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent), ui(new Ui::Interfac
     ui->setupUi(this);
     Clientcont = ClientControl::getInstance((this->parent()),this);
     Clientcam = ClientCamera::getInstance((this->parent()),this);
+    controller1 = new SimpleXbox360Controller(0);
+
+    controller1->startAutoPolling(20);
+
     initinterface();
     initConnect();
-    QObject::connect(ui->menuA_propos, SIGNAL(aboutToShow()),this, SLOT(a_propos()), Qt::QueuedConnection);
 }
 
 Interface::~Interface()
@@ -54,6 +57,11 @@ void Interface::initinterface()
         ui->displayCurrent->setNum(0);
         ui->displaySpeed->setNum(0);
         ui->batteryLevel->setValue(0);
+        ui->pbSpeedLF->setValue(0);
+        ui->pbSpeedRF->setValue(0);
+        ui->pbSpeedLR->setValue(0);
+        ui->pbSpeedRR->setValue(0);
+        ui->lblController->setPixmap(QPixmap());
         ui->frame->setPixmap(QPixmap());
         ui->frame->setText("NO SIGNAL");
         ui->displayIR1->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");
@@ -68,6 +76,10 @@ void Interface::initinterface()
 
 void Interface::initConnect()
 {
+    QObject::connect(controller1,SIGNAL(controllerNewState(SimpleXbox360Controller::InputState)),this,SLOT(displayGamepadState(SimpleXbox360Controller::InputState)));
+    QObject::connect(controller1,SIGNAL(controllerConnected(uint)),this,SLOT(GamepadConnected()));
+    QObject::connect(controller1,SIGNAL(controllerDisconnected(uint)),this,SLOT(GamepadDisconnected()));
+
     QObject::connect(this, SIGNAL(robotDisconnect()),Clientcont, SLOT(socketDisconnected()), Qt::QueuedConnection);
     QObject::connect(this, SIGNAL(camDisconnect()),Clientcam, SLOT(disconnect()), Qt::QueuedConnection);
     QObject::connect(this, SIGNAL(startImshow()),Clientcam, SLOT(openImshow()), Qt::QueuedConnection);
@@ -333,7 +345,7 @@ void Interface::setcolorConnected(QString color)
 
 void Interface::setBatLevel(int lvl)
 {
-    mutex.lock();
+    //mutex.lock();
     if(lvl>140)
     {
         ui->batteryLevel->setValue(100);
@@ -351,7 +363,7 @@ void Interface::setBatLevel(int lvl)
         ui->batteryLabel->setPixmap(mypix);
         ui->batteryLevel->setValue((lvl*100)/130);
     }
-    mutex.unlock();
+    //mutex.unlock();
 }
 
 void Interface::setImage(QImage img)
@@ -366,32 +378,32 @@ void Interface::setImage(QString img)
 
 void Interface::setVitLeft(int lvl)
 {
-    mutex.lock();
+    //mutex.lock();
         if(lvl>0)
         {
             ui->pbSpeedLF->setValue(lvl);
         }else if(lvl<0)
         {
-            ui->pbSpeedLR->setValue((int)qFloor(lvl));
+            ui->pbSpeedLR->setValue((int)qFabs(lvl));
         }else
         {
-            ui->pbSpeedRR->setValue(0);
-            ui->pbSpeedRF->setValue(0);
+            ui->pbSpeedLF->setValue(0);
+            ui->pbSpeedLR->setValue(0);
         }
         speedL=(int)qFloor(lvl);
         setVitesseGlobal();
-    mutex.unlock();
+    //mutex.unlock();
 }
 
 void Interface::setVitRight(int lvl)
 {
-    mutex.lock();
+   // mutex.lock();
         if(lvl>0)
         {
             ui->pbSpeedRF->setValue(lvl);
         }else if(lvl<0)
         {
-            ui->pbSpeedRR->setValue((int)qFloor(lvl));
+            ui->pbSpeedRR->setValue((int)qFabs(lvl));
         }else
         {
             ui->pbSpeedRR->setValue(0);
@@ -399,20 +411,22 @@ void Interface::setVitRight(int lvl)
         }
         speedR=(int)qFloor(lvl);
         setVitesseGlobal();
-    mutex.unlock();
+    //mutex.unlock();
 }
 
 void Interface::setVitesseGlobal()
 {
     mutex.lock();
         int vitleft, vitright,rpmPerTics;
-        //2048 / wheel turn     1 wheel turn =46.5cm   156rpm->240tics/set  1r->2048 tics
+        //2048 / wheel turn     1 wheel turn =46.5cm speedL et speedR en tics/50ms
         int res;
         vitleft=speedL;
         vitright=speedR;
-        res=(int)((vitright+vitleft)/2);
-        rpmPerTics=(int)((res*156)/240);
-        res=(int)((rpmPerTics*0.5)/60);//en m/s
+        res=(int)((vitright+vitleft)/2);//tics/50ms
+        /*rpmPerTics=(int)((res*156)/240);
+        res=(int)(((rpmPerTics*0.5)*100)/60);*///en cm/s
+        res=res*20;//tics/s
+        res=(int)(res*0.023);//en cm/s
         ui->displaySpeed->setNum(res);
     mutex.unlock();
 }
@@ -438,10 +452,6 @@ int Interface::computeDistance(float lvl, float oldLvl)
 void Interface::setIR1(int lvl)//Avant-Droit
 {
     mutex.lock();
-        /*IR1=lvl;
-        ui->displayIR1->setNum(IR1);
-        oldIR1=IR1;*/
-
         IR1=lvl;
         if(IR1<oldIR1)//rapprochement
         {
@@ -467,27 +477,23 @@ void Interface::setIR1(int lvl)//Avant-Droit
 void Interface::setIR2(int lvl)//Arrière-Gauche
 {
     mutex.lock();
-        /*IR2=lvl;
-        ui->displayIR2->setNum(IR2);//(unsigned char)(lvl*(3.3/255)));
-        oldIR2=IR2;*/
-
         IR2=lvl;
         if(IR2<oldIR2)//rapprochement
         {
             if(IR2>156)//30cm = trop prés
             {
-                emit robotFrontCollisionOn();
-                ui->displayIR2->setStyleSheet("QLabel {background-color : rgb(255,40,40); }");//>setNum(IR4);
+                emit robotRearCollisionOn();
+                ui->displayIR2->setStyleSheet("QLabel {background-color : rgb(255,40,40); }");
             }
             else
             {
-                emit robotFrontCollisionOff();
-                ui->displayIR2->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");//>setNum(IR4);
+                emit robotRearCollisionOff();
+                ui->displayIR2->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");
             }
         }
         else//éloignement ou autres
         {
-            ui->displayIR2->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");//>setNum(IR4);
+            ui->displayIR2->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");
         }
         oldIR2=IR2;
     mutex.unlock();
@@ -496,27 +502,23 @@ void Interface::setIR2(int lvl)//Arrière-Gauche
 void Interface::setIR3(int lvl)//Arrière-Droit
 {
     mutex.lock();
-        /*IR3=lvl;
-        ui->displayIR3->setNum(IR3);//(unsigned char)(lvl*(3.3/255)));
-        oldIR3=IR3;*/
-
         IR3=lvl;
         if(IR3<oldIR3)//rapprochement
         {
             if(IR3>156)//30cm = trop prés
             {
-                emit robotFrontCollisionOn();
-                ui->displayIR3->setStyleSheet("QLabel {background-color : rgb(255,40,40); }");//>setNum(IR4);
+                emit robotRearCollisionOn();
+                ui->displayIR3->setStyleSheet("QLabel {background-color : rgb(255,40,40); }");
             }
             else
             {
-                emit robotFrontCollisionOff();
-                ui->displayIR3->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");//>setNum(IR4);
+                emit robotRearCollisionOff();
+                ui->displayIR3->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");
             }
         }
         else//éloignement ou autres
         {
-            ui->displayIR3->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");//>setNum(IR4);
+            ui->displayIR3->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");
         }
         oldIR3=IR3;
     mutex.unlock();
@@ -531,17 +533,17 @@ void Interface::setIR4(int lvl) //Avant-Gauche
             if(IR4>156)//30cm = trop prés
             {
                 emit robotFrontCollisionOn();
-                ui->displayIR4->setStyleSheet("QLabel {background-color : rgb(255,40,40); }");//>setNum(IR4);
+                ui->displayIR4->setStyleSheet("QLabel {background-color : rgb(255,40,40); }");
             }
             else
             {
                 emit robotFrontCollisionOff();
-                ui->displayIR4->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");//>setNum(IR4);
+                ui->displayIR4->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");
             }
         }
         else//éloignement ou autres
         {
-            ui->displayIR4->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");//>setNum(IR4);
+            ui->displayIR4->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");
         }
         oldIR4=IR4;
     mutex.unlock();
@@ -549,37 +551,37 @@ void Interface::setIR4(int lvl) //Avant-Gauche
 
 void Interface::setVersion(int vers)
 {
-    mutex.lock();
+    //mutex.lock();
         ui->displayVersion->setNum(vers);
-    mutex.unlock();
+    //mutex.unlock();
 }
 
 void Interface::setCurrent(int curr)
 {
-    mutex.lock();
+    //mutex.lock();
         ui->displayCurrent->setNum((int)(curr));//*0.194-37.5));
-    mutex.unlock();
+    //mutex.unlock();
 }
 
 void Interface::setOdoL(long odo)
 {
-    mutex.lock();
+    //mutex.lock();
         odoL=odo;
-    mutex.unlock();
+    //mutex.unlock();
 }
 
 void Interface::setOdoR(long odo)
 {
-    mutex.lock();
+   // mutex.lock();
         odoR=odo;
-    mutex.unlock();
+    //mutex.unlock();
 }
 
 void Interface::getSliderCamValue()
 {
-    mutex.lock();
+    //mutex.lock();
         emit sendSliderCamValue(ui->sliderSpeedCam->value());
-    mutex.unlock();
+    //mutex.unlock();
 }
 
 //********************************** CAMERA CONTROL **********************************//
@@ -707,7 +709,6 @@ void Interface::on_dotCamera_clicked()
 
 void Interface::on_dotCamera_released()
 {
-    //emit moveCamera(9);
     QPixmap mypix (":/image/image/arrowDotCamera.png");
     ui->dotCamera->setPixmap(mypix);
 }
@@ -764,7 +765,6 @@ void Interface::on_cameraRight_clicked()
 
 void Interface::ControlDirection()
 {
-
     if(Ipressed && !Jpressed && !Kpressed && !Lpressed)
     { // avant
         emit LeftSpeedFlag(1); // mise en route gauche
@@ -956,8 +956,6 @@ void Interface::on_robotLeft_released()
     ControlDirection();
 }
 
-
-
 //********************************** FRAME ACTION **********************************//
 
 void Interface::on_actionQuitter_triggered()
@@ -967,20 +965,13 @@ void Interface::on_actionQuitter_triggered()
 
 void Interface::on_actionActiver_Manette_changed()
 {
-    if(imgProc)
+    if(controllerOn)
     {
         controllerOn=false;
     }else
     {
         controllerOn=true;
     }
-}
-
-
-void Interface::a_propos()
-{
-    About* window= new About();
-    window->exec();
 }
 
 void Interface::receiveIPCam(QString ipc)
@@ -1037,3 +1028,112 @@ void Interface::on_actionImshow_OpenCV_changed()
     }
 }
 
+
+void Interface::on_actionAbout_triggered()
+{
+    About* window= new About();
+    window->exec();
+}
+
+
+//********************************** CONTROLLER **********************************//
+void Interface::GamepadConnected()
+{
+    gamepadConnected=true;
+    QPixmap mypix (":/image/image/controller.png");
+    ui->lblController->setPixmap(mypix);
+    controller();
+}
+
+void Interface::GamepadDisconnected()
+{
+    gamepadConnected=false;
+    ui->lblController->setPixmap(QPixmap());
+}
+
+void Interface::displayGamepadState(SimpleXbox360Controller::InputState GamepadState)
+{
+    currentGamepadState=GamepadState;
+    controller();
+}
+
+
+void Interface::controller()
+{
+    if(gamepadConnected && controllerOn && robotconnected){
+
+        //BUTTONS ACTION
+        if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
+        {
+            emit moveCamera(9);
+        }
+        if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_RIGHT ))//droite
+        {
+            emit LeftSpeedFlag(0);
+            emit RightSpeedFlag(1);
+            emit LeftSpeed(180);
+            emit RightSpeed(180);
+        }
+        else if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_LEFT ))//gauche
+        {
+            emit LeftSpeedFlag(1);
+            emit RightSpeedFlag(0);
+            emit LeftSpeed(180);
+            emit RightSpeed(180);
+        }
+        else if((currentGamepadState.rightTrigger>currentGamepadState.leftTrigger) && (currentGamepadState.rightTrigger>0) &&(currentGamepadState.leftTrigger>0))
+        {
+            emit LeftSpeedFlag(1);
+            emit RightSpeedFlag(1);
+            if(currentGamepadState.leftThumbX>0)
+            {
+                emit LeftSpeed((int)(currentGamepadState.rightTrigger*240));
+                emit RightSpeed((int)(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX)));
+            }
+            else
+            {
+                emit LeftSpeed((int)(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX)));
+                emit RightSpeed((int)(currentGamepadState.rightTrigger*240));
+            }
+
+        }
+        else
+        {
+            emit LeftSpeedFlag(0);
+            emit RightSpeedFlag(0);
+            if(currentGamepadState.leftThumbX>0)
+            {
+                emit LeftSpeed((int)(currentGamepadState.rightTrigger*240));
+                emit RightSpeed((int)(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX)));
+            }
+            else
+            {
+                emit LeftSpeed((int)(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX)));
+                emit RightSpeed((int)(currentGamepadState.rightTrigger*240));
+            }
+        }
+
+        if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_RIGHT ))//droite
+        {
+            emit moveCamera(9);
+        }
+
+        if(currentGamepadState.rightThumbX>0)//droite
+        {
+            emit moveCamera(4);
+        }
+        if(currentGamepadState.rightThumbX<0)//gauche
+        {
+            emit moveCamera(3);
+        }
+        if(currentGamepadState.rightThumbY>0)//haut
+        {
+            emit moveCamera(1);
+        }
+        if(currentGamepadState.rightThumbY<0)//bas
+        {
+            emit moveCamera(2);
+        }
+
+    }
+}

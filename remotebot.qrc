@@ -27,5 +27,6 @@
         <file>image/current.png</file>
         <file>image/connectwarningcamera.png</file>
         <file>image/connectwarningrobot.png</file>
+        <file>image/controller.png</file>
     </qresource>
 </RCC>

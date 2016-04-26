@@ -297,7 +297,8 @@ void ClientCamera::setVitesseVar()
 void ClientCamera::openImageVStream()
 {
     url=QString("http://"+IP+":"+QString::number(port));
-    videoStreamAddress=url+"/cameras/1?q=30";///?action=stream";//"/javascript_simple.html";/cameras/1?q=30 /?action=snapshot&n=7 /?action=stream
+    videoStreamAddress=url+"/?action=stream";///?action=stream";//"/javascript_simple.html";/cameras/1?q=30 /?action=snapshot&n=7 /?action=stream
+    qDebug() << videoStreamAddress;
     if(!vcap.open(videoStreamAddress.toStdString()))
     {
         qDebug() << "Error opening video stream or file";
@@ -308,7 +309,7 @@ void ClientCamera::openImageVStream()
 void ClientCamera::getImageVStream()
 {
     Mat resFrame;
-    //msleep(1000);
+    msleep(20);
     if(!vcap.read(frame))
     {
         qDebug() << "No frame";
@@ -317,7 +318,7 @@ void ClientCamera::getImageVStream()
     if(!STOP)
     {
         resFrame=frame;
-        frame1=resFrame;
+        //frame1=resFrame;
         if(imgProcess)
         {
             imgProcesscreated=true;
@@ -339,7 +340,7 @@ void ClientCamera::getImageVStream()
             cvDestroyWindow( "video" );
             bImshowcreated=false;
         }
-        frame2=resFrame;
+        //frame2=resFrame;
         emit frameStream(getQImageFromFrame(resFrame));
     }
 }
@@ -348,100 +349,22 @@ void ClientCamera::imageProcessing(bool i)
 {
     if(i)
     {
-        /*cedge.create(frame.size(), frame.type());
-        cvtColor(frame, gray, COLOR_BGR2GRAY);
-        blur(gray, edge, Size(3,3));
-        // Run the edge detector on grayscale
-        Canny(edge, edge, edgeThresh, edgeThresh*3, 3);
-        cedge = Scalar::all(0);
-        frame.copyTo(cedge, edge);
-        imshow("Edge map", cedge);
-        waitKey(1);*/
-
-
-        /*cvtColor(frame1,grayImage1,COLOR_BGR2GRAY);
-        cvtColor(frame2,grayImage2,COLOR_BGR2GRAY);
-        absdiff(grayImage1,grayImage2,differenceImage);
-        //threshold(differenceImage,thresholdImage,SENSITIVITY_VALUE,255,THRESH_BINARY);
-        blur(thresholdImage,thresholdImage,cv::Size(BLUR_SIZE,BLUR_SIZE));
-        //threshold(thresholdImage,thresholdImage,SENSITIVITY_VALUE,255,THRESH_BINARY);
-        cv::imshow("Difference Image",differenceImage);
-        cv::imshow("Threshold Image", thresholdImage);
-        searchForMovement(thresholdImage,frame1);
-        imshow("Motion Track", frame1);*/
-
-
-        updateMotionHistory(motion_mask,motion_history,timestamp,MHI_DURATION);
-        calcMotionGradient(motion_history, mg_mask, mg_orient, 5, 12500.0, 3);
-        segmentMotion(motion_history, seg_mask, seg_bounds, timestamp, 32);
+        vector<Mat> colors;
+        Mat resframe = frame;
+        Mat outputframe;
+        split(resframe, colors);
+        equalizeHist(colors[0], colors[0]);
+        equalizeHist(colors[1], colors[1]);
+        equalizeHist(colors[2], colors[2]);
+        merge(colors, outputframe);
+        imshow("Night Vision", resframe);
 
         waitKey(1);
     }
     else if(imgProcesscreated &&!i)
     {
-        cvDestroyWindow( "Motion Track" );
-        cvDestroyWindow( "Difference Image" );
-        cvDestroyWindow( "Threshold Image" );
+        cvDestroyWindow( "Night Vision" );
     }
-}
-
-void ClientCamera::draw_motion_comp(Mat& img, int x_coordinate, int y_coordinate, int width, int height, double angle,Mat& result)
-{
-//	rectangle(img,Point(x_coordinate,y_coordinate), Point(x_coordinate+width,y_coordinate+width), Scalar(255,0,0), 1, 8, 0);
-    int r,cx,cy;
-    if(height/2 <= width/2)
-        r = height/2;
-    else
-        r = width/2;
-    cx = x_coordinate + width/2;
-    cy = y_coordinate + height/2;
-    angle = angle*M_PI/180;
-    circle(img, Point(cx,cy), r, Scalar(255,0,0),1, 8, 0);
-    line(img, Point(cx,cy), Point(int(cx+cos(angle)*r), int(cy+sin(angle)*r)), Scalar(255,0,0), 1, 8, 0);
-    result = img.clone();
-}
-string ClientCamera::intToString(int number)
-{
-    stringstream ss;
-    ss << number;
-    return ss.str();
-}
-
-void ClientCamera::searchForMovement(Mat thresholdImage, Mat &cameraFeed)
-{
-    /*bool objectDetected = false;
-    Mat temp;
-    thresholdImage.copyTo(temp);
-    vector< vector<Point> > contours;
-    vector<Vec4i> hierarchy;
-    //findContours(temp,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );// retrieves all contours
-    findContours(temp,contours,hierarchy,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE );// retrieves external contours
-    if(contours.size()>0)
-    {
-        objectDetected=true;
-        qDebug()<<"plop";
-    }
-    else
-    {
-        objectDetected = false;
-    }
-    if(objectDetected)
-    {
-        vector< vector<Point> > largestContourVec;
-        largestContourVec.push_back(contours.at(contours.size()-1));
-        objectBoundingRectangle = boundingRect(largestContourVec.at(0));
-        int xpos = objectBoundingRectangle.x+objectBoundingRectangle.width/2;
-        int ypos = objectBoundingRectangle.y+objectBoundingRectangle.height/2;
-        theObject[0] = xpos , theObject[1] = ypos;
-    }
-    int x = theObject[0];
-    int y = theObject[1];
-    circle(cameraFeed,Point(x,y),20,Scalar(0,255,0),2);
-    line(cameraFeed,Point(x,y),Point(x,y-25),Scalar(0,255,0),2);
-    line(cameraFeed,Point(x,y),Point(x,y+25),Scalar(0,255,0),2);
-    line(cameraFeed,Point(x,y),Point(x-25,y),Scalar(0,255,0),2);
-    line(cameraFeed,Point(x,y),Point(x+25,y),Scalar(0,255,0),2);
-    putText(cameraFeed,"Tracking object at (" + intToString(x)+","+intToString(y)+")",Point(x,y),1,1,Scalar(255,0,0),2);*/
 }
 
 QImage ClientCamera::getQImageFromFrame(Mat f)

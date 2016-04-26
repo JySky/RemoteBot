@@ -14,6 +14,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Wifibot
 TEMPLATE = app
+win32:LIBS += $${_PRO_FILE_PWD_}/XInput.lib
+
+OTHER_FILES += \
+    XInput.lib
 
 win32: RC_ICONS = RemoteBot.ico
 SOURCES += main.cpp\
@@ -22,14 +26,17 @@ SOURCES += main.cpp\
     config.cpp \
     clientcamera.cpp \
     clickablelabel.cpp \
-    about.cpp
+    about.cpp \
+    simplexbox360controller.cpp
 
 HEADERS  += interface.h \
     clientcontrol.h \
     config.h \
     clientcamera.h \
     clickablelabel.h \
-    about.h
+    about.h \
+    XInput.h \
+    simplexbox360controller.h
 
 FORMS    += interface.ui \
     config.ui \

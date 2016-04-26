@@ -1,11 +1,11 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
+#include "simplexbox360controller.h"
 #include "clientcontrol.h"
 #include "config.h"
 #include <QMainWindow>
 #include <iostream>
 #include <stdio.h>
-#include "clientcamera.h"
 #include "clickablelabel.h"
 #include <QMessageBox>
 #include <QInputDialog>
@@ -15,15 +15,12 @@
 #include <about.h>
 #include <QThread>
 #include <QMutex>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <QtMath>
+
 
 namespace Ui {
     class Interface;
 }
-using namespace cv;
 class ClientControl;
 class ClientCamera;
 class About;
@@ -72,6 +69,11 @@ class Interface : public QMainWindow
             void initConnect();
             int computeDistance(float lvl, float oldLvl);
 
+            SimpleXbox360Controller* controller1;
+            SimpleXbox360Controller::InputState currentGamepadState;
+            bool gamepadConnected;
+            void controller();
+
         protected:
             void keyPressEvent(QKeyEvent *event);
             void keyReleaseEvent(QKeyEvent *event);
@@ -101,8 +103,8 @@ class Interface : public QMainWindow
             void on_actionQuitter_triggered();
             void on_actionActiver_Manette_changed();
             void on_actionActiver_Traitement_Image_changed();
-            void a_propos();
             void on_actionImshow_OpenCV_changed();
+            void on_actionAbout_triggered();
 
         public:
             Ui::Interface *getUi(){return ui;}
@@ -113,6 +115,11 @@ class Interface : public QMainWindow
             void setImage(QString img);
 
         public slots :
+            //void controllerConnected(uint controllerNum);
+            void displayGamepadState(SimpleXbox360Controller::InputState GamepadState);
+            void GamepadConnected(void);
+            void GamepadDisconnected(void);
+
             void setBatLevel(int lvl);
             void setVitLeft(int lvl);
             void setVitRight(int lvl);

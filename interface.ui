@@ -34,6 +34,9 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
+  </property>
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonIconOnly</enum>
   </property>
@@ -59,6 +62,9 @@
       <height>151</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk{background-color: rgb(0,145,255)}</string>
+    </property>
     <property name="maximum">
      <number>280</number>
     </property>
@@ -80,6 +86,9 @@
       <width>20</width>
       <height>151</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk{background-color: rgb(0,145,255)}</string>
     </property>
     <property name="minimum">
      <number>0</number>
@@ -142,6 +151,9 @@
       <height>151</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk{background-color: rgb(0,145,255)}</string>
+    </property>
     <property name="maximum">
      <number>280</number>
     </property>
@@ -163,6 +175,9 @@
       <width>20</width>
       <height>151</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk{background-color: rgb(0,145,255)}</string>
     </property>
     <property name="maximum">
      <number>280</number>
@@ -220,11 +235,14 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QProgressBar::chunk{background-color: rgb(0,145,255)}</string>
+    </property>
     <property name="value">
      <number>0</number>
     </property>
     <property name="alignment">
-     <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+     <set>Qt::AlignCenter</set>
     </property>
     <property name="textVisible">
      <bool>true</bool>
@@ -291,9 +309,9 @@
    <widget class="QLabel" name="batteryLabel">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>360</x>
       <y>10</y>
-      <width>31</width>
+      <width>41</width>
       <height>21</height>
      </rect>
     </property>
@@ -595,7 +613,7 @@
    <widget class="QLabel" name="colorConnected">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>320</x>
       <y>10</y>
       <width>28</width>
       <height>21</height>
@@ -856,7 +874,7 @@
    <widget class="QLabel" name="lblCurrent">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>230</x>
       <y>10</y>
       <width>16</width>
       <height>21</height>
@@ -875,7 +893,7 @@
    <widget class="QLabel" name="displayCurrent">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>230</x>
       <y>10</y>
       <width>71</width>
       <height>21</height>
@@ -889,6 +907,9 @@
       <bold>false</bold>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel{background-color: rgba(255, 255, 255, 0);}</string>
+    </property>
     <property name="text">
      <string>0</string>
     </property>
@@ -899,7 +920,7 @@
    <widget class="QLabel" name="displayCurrentlbl">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>260</x>
       <y>10</y>
       <width>71</width>
       <height>21</height>
@@ -952,6 +973,67 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
+   <widget class="QLabel" name="lblController">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>10</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="remotebot.qrc">:/image/image/controller.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <zorder>displayCurrentlbl</zorder>
+   <zorder>pbSpeedLF</zorder>
+   <zorder>pbSpeedLR</zorder>
+   <zorder>frame</zorder>
+   <zorder>pbSpeedRF</zorder>
+   <zorder>pbSpeedRR</zorder>
+   <zorder>sliderSpeed</zorder>
+   <zorder>batteryLevel</zorder>
+   <zorder>line</zorder>
+   <zorder>line_2</zorder>
+   <zorder>robotStart</zorder>
+   <zorder>robotStop</zorder>
+   <zorder>batteryLabel</zorder>
+   <zorder>cameraUp</zorder>
+   <zorder>dotCamera</zorder>
+   <zorder>cameraRight</zorder>
+   <zorder>cameraLeft</zorder>
+   <zorder>cameraDown</zorder>
+   <zorder>robotLeft</zorder>
+   <zorder>dotRobot</zorder>
+   <zorder>robotUp</zorder>
+   <zorder>robotDown</zorder>
+   <zorder>robotRight</zorder>
+   <zorder>vitesseLogo</zorder>
+   <zorder>displaySpeedSet</zorder>
+   <zorder>displaySpeed</zorder>
+   <zorder>logo2</zorder>
+   <zorder>sliderSpeedCam</zorder>
+   <zorder>displaySpeedSetCam</zorder>
+   <zorder>line_3</zorder>
+   <zorder>displayIR4</zorder>
+   <zorder>displayIR2</zorder>
+   <zorder>displayIR1</zorder>
+   <zorder>displayIR3</zorder>
+   <zorder>displayVersion</zorder>
+   <zorder>lblVersion</zorder>
+   <zorder>lblVersion_2</zorder>
+   <zorder>displayVersion_2</zorder>
+   <zorder>displayCurrent</zorder>
+   <zorder>colorConnected</zorder>
+   <zorder>lblCurrent</zorder>
+   <zorder>lblController</zorder>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -965,7 +1047,7 @@
    </property>
    <widget class="QMenu" name="menuConfigurer">
     <property name="title">
-     <string>Configurer</string>
+     <string>Configure</string>
     </property>
     <widget class="QMenu" name="menuOption">
      <property name="title">
@@ -982,15 +1064,16 @@
    </widget>
    <widget class="QMenu" name="menuA_propos">
     <property name="title">
-     <string>A propos</string>
+     <string>Help</string>
     </property>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuConfigurer"/>
    <addaction name="menuA_propos"/>
   </widget>
   <action name="actionPort_et_IP">
    <property name="text">
-    <string>Port et IP</string>
+    <string>Port and IP</string>
    </property>
   </action>
   <action name="actionActiver_Traitement_Image">
@@ -998,7 +1081,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Activer Traitement Image</string>
+    <string>Image Processing On/Off</string>
    </property>
   </action>
   <action name="actionActiver_Manette">
@@ -1006,12 +1089,12 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Activer Manette</string>
+    <string>Controller On/Off</string>
    </property>
   </action>
   <action name="actionQuitter">
    <property name="text">
-    <string>Quitter</string>
+    <string>Quit</string>
    </property>
   </action>
   <action name="actionImshow_OpenCV">
@@ -1020,6 +1103,11 @@
    </property>
    <property name="text">
     <string>Imshow OpenCV</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

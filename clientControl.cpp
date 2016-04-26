@@ -13,7 +13,6 @@ QString ClientControl::IP="192.168.1.106";
 ClientControl::ClientControl(QObject *parent, Interface *inter) :
         QThread(parent)
 {
-
     MainInter=inter;
     QObject::connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     QObject::connect(this, SIGNAL(connected()),MainInter, SLOT(robotConnected()), Qt::QueuedConnection);
@@ -73,7 +72,7 @@ void ClientControl::run()
             //mutex.lock();
             dataRead();
             //mutex.unlock();
-            /*emit BatLevel(battery);
+            emit BatLevel(battery);
             emit VitLeft(speedL);
             emit VitRight(speedR);
             emit IR1(ir1);
@@ -83,7 +82,7 @@ void ClientControl::run()
             emit Version(version);
             emit Current(current);
             emit ODOL(odoL);
-            emit ODOR(odoR);*/
+            emit ODOR(odoR);
         }
     }
     soc->close();
@@ -271,35 +270,29 @@ quint16 ClientControl::Crc16(QByteArray* byteArray, int pos)
 
 void ClientControl::receive(QByteArray data)
 {
-    // Left
+
     mutex.lock();
-    speedL = ((((unsigned char)data.at(1) << 8)) + ((unsigned char)data.at(0)));
-    if (speedL> 32767)
-    {
-        speedL-=65536;
-    }
-    battery = data.at(2);
-    ir4 = data.at(3);
-    ir3 = data.at(4);
-    //odoL = data.at(5)+(data.at(6)<<8)+(data.at(7)<<16)+(data.at(8)<<24);
-    odoL=((((unsigned char)data.at(8) << 24))+(((unsigned char)data.at(7) << 16))+(((unsigned char)data.at(6) << 8))+((unsigned char)data.at(5)));
-    qDebug()<<"odoL";
-    qDebug()<<odoL;
-
-    // Right
-    speedR = ((((unsigned char)data.at(10) << 8)) + ((unsigned char)data.at(9)));
-    if (speedR> 32767)
-    {
-        speedR-=65536;
-    }
-    ir1 = data.at(11);
-    ir2 = data.at(12);
-    odoR=((((long) data.at(16) << 24))+(((long) data.at(15) << 16))+(((long) data.at(14) << 8))+((long) data.at(13)));
-
-    //odoR = data.at(13)+(data.at(14)<<8)+(data.at(15)<<16)+(data.at(16)<<24);
-
-    current = data.at(17);
-    version = data.at(18);
+        // Left
+        speedL = ((((unsigned char)data.at(1) << 8)) + ((unsigned char)data.at(0)));
+        if (speedL> 32767)
+        {
+            speedL-=65536;
+        }
+        battery = data.at(2);
+        ir4 = (unsigned char)data.at(3);
+        ir3 = (unsigned char)data.at(4);
+        odoL=((((unsigned char)data.at(8) << 24))+(((unsigned char)data.at(7) << 16))+(((unsigned char)data.at(6) << 8))+((unsigned char)data.at(5)));
+        // Right
+        speedR = ((((unsigned char)data.at(10) << 8)) + ((unsigned char)data.at(9)));
+        if (speedR> 32767)
+        {
+            speedR-=65536;
+        }
+        ir1 = (unsigned char)data.at(11);
+        ir2 = (unsigned char)data.at(12);
+        odoR=((((long) data.at(16) << 24))+(((long) data.at(15) << 16))+(((long) data.at(14) << 8))+((long) data.at(13)));
+        current = data.at(17);
+        version = data.at(18);
     mutex.unlock();
 }
 
