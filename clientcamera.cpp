@@ -336,21 +336,31 @@ void ClientCamera::imageProcessing(bool i)
 {
     if(i)
     {
-        vector<Mat> colors;
+        Mat resframe = frame;
+        int edgeThresh = 1;
+        Mat gray, edge, cedge;
+        cedge.create(resframe.size(), resframe.type());
+        cvtColor(resframe, gray, COLOR_BGR2GRAY);
+        blur(gray, edge, Size(3,3));
+        Canny(edge, edge, edgeThresh, edgeThresh*3, 3);
+        cedge = Scalar::all(0);
+        image.copyTo(cedge, edge);
+        imshow("Edge map", cedge);
+        /*vector<Mat> colors;
         Mat resframe = frame;
         Mat outputframe;
         split(resframe, colors);
         equalizeHist(colors[0], colors[0]);
         equalizeHist(colors[1], colors[1]);
         equalizeHist(colors[2], colors[2]);
-        merge(colors, outputframe);
-        imshow("Night Vision", resframe);
+        merge(colors, outputframe);*/
+        //imshow("Night Vision", resframe);
 
         waitKey(1);
     }
     else if(imgProcesscreated &&!i)
     {
-        cvDestroyWindow( "Night Vision" );
+        cvDestroyWindow( "Edge map" );
     }
 }
 
