@@ -61,14 +61,14 @@ class Interface : public QMainWindow
             int oldIR4;
             long odoL;
             long odoR;
+            long toltalDistance;
             void setVitesseGlobal();
             void ControlDirection();
             void ControlCam();
             void majConnectedState();
             void initinterface();
             void initConnect();
-            int computeDistance(float lvl, float oldLvl);
-
+            void computeDistance();
             SimpleXbox360Controller* controller1;
             SimpleXbox360Controller::InputState currentGamepadState;
             bool gamepadConnected;
@@ -178,6 +178,7 @@ class Interface : public QMainWindow
             void robotRearCollisionOff();
 
             void moveCamera(int);
+            void vibration(float,float);
 };
 
 #endif // INTERFACE_H

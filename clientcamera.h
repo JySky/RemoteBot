@@ -95,25 +95,6 @@ class ClientCamera: public QThread
         void imageProcessing(bool i);
         void init();
 
-        const static float MHI_DURATION;
-        const static int DEFAULT_THRESHOLD;
-        const static float MAX_TIME_DELTA;
-        const static float MIN_TIME_DELTA;
-        const static int visual_trackbar;
-        void draw_motion_comp(Mat& img, int x_coordinate, int y_coordinate, int width, int height, double angle,Mat& result);
-
-        void searchForMovement(Mat thresholdImage, Mat &cameraFeed);
-        const static int BLUR_SIZE;
-        const static int SENSITIVITY_VALUE;
-        Mat frame1,frame2;
-        Mat grayImage1,grayImage2;
-        Mat differenceImage;
-        Mat thresholdImage;
-        string intToString(int number);
-        /*int edgeThresh;
-        Mat image, gray, edge, cedge;*/
-
-
     public slots:
         void receiveSliderCamValue(int val);
         void setIP(QString IP);

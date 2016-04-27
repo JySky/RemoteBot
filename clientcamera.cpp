@@ -14,15 +14,6 @@ const int ClientCamera::setVitesseDisable=0;
 const int ClientCamera::horizontalRatio=58;
 const int ClientCamera::verticalRatio=29;
 
-/*const int ClientCamera::SENSITIVITY_VALUE = 20;
-const int ClientCamera::BLUR_SIZE = 10;
-int theObject[2] = {0,0};
-Rect objectBoundingRectangle = Rect(0,0,0,0);*/
-const float ClientCamera::MHI_DURATION = 0.05;
-const int ClientCamera::DEFAULT_THRESHOLD = 32;
-const float ClientCamera::MAX_TIME_DELTA = 12500.0;
-const float ClientCamera::MIN_TIME_DELTA = 5;
-const int ClientCamera::visual_trackbar = 2;
 
 //********************************** CONSTRUCTOR **********************************//
 
@@ -33,18 +24,16 @@ ClientCamera::ClientCamera(QObject *parent,Interface *inter) :
     QObject::connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     QObject::connect(this, SIGNAL(connected()),MainInter, SLOT(camConnected()), Qt::QueuedConnection);
     QObject::connect(this, SIGNAL(disconnected()),MainInter, SLOT(camDisconnected()), Qt::QueuedConnection);
-    //QObject::connect(this, SIGNAL(streamStopped()),MainInter, SLOT(camStreamState()), Qt::QueuedConnection);
-    //QObject::connect(this, SIGNAL(frameStream(QImage)),MainInter, SLOT(setFrame(QImage)), Qt::DirectConnection);
     QObject::connect(this, SIGNAL(frameStream(QImage)),MainInter, SLOT(setFrame(QImage)), Qt::QueuedConnection);
     QObject::connect(this, SIGNAL(requestSliderCamValue()),MainInter, SLOT(getSliderCamValue()), Qt::QueuedConnection);
     init();
-    //edgeThresh = 1;
 }
 
 ClientCamera::~ClientCamera()
 {
     m_instance=NULL;
 }
+
 void ClientCamera::init()
 {
     connectedState=false;
@@ -61,7 +50,6 @@ void ClientCamera::init()
     bImshow=false;
     imgProcess=false;
     imgProcesscreated=false;
-    frame2=Mat(1,1, CV_64F, cvScalar(0.));
 }
 
 //********************************** THREAD MANAGEMENT **********************************//
@@ -74,9 +62,7 @@ void ClientCamera::run()
     {
         while(!STOP)
         {
-            //mutex.lock();
             getImageVStream();
-            //mutex.unlock();
             msleep(25);
         }
     }
@@ -244,7 +230,11 @@ void ClientCamera::moveCam(int pos)
 
 void ClientCamera::urlAccess(QString url)
 {
+    msleep(20);
+    manager=new QNetworkAccessManager();
+    manager->connectToHost(IP,port);
     manager->get(QNetworkRequest(url));
+    manager=NULL;
 }
 
 bool ClientCamera::urlAccessState(QString url)
@@ -298,7 +288,6 @@ void ClientCamera::openImageVStream()
 {
     url=QString("http://"+IP+":"+QString::number(port));
     videoStreamAddress=url+"/?action=stream";///?action=stream";//"/javascript_simple.html";/cameras/1?q=30 /?action=snapshot&n=7 /?action=stream
-    qDebug() << videoStreamAddress;
     if(!vcap.open(videoStreamAddress.toStdString()))
     {
         qDebug() << "Error opening video stream or file";
@@ -318,7 +307,6 @@ void ClientCamera::getImageVStream()
     if(!STOP)
     {
         resFrame=frame;
-        //frame1=resFrame;
         if(imgProcess)
         {
             imgProcesscreated=true;
@@ -340,7 +328,6 @@ void ClientCamera::getImageVStream()
             cvDestroyWindow( "video" );
             bImshowcreated=false;
         }
-        //frame2=resFrame;
         emit frameStream(getQImageFromFrame(resFrame));
     }
 }

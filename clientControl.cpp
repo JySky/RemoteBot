@@ -288,6 +288,8 @@ void ClientControl::receive(QByteArray data)
         {
             speedR-=65536;
         }
+        qDebug()<<"speed";
+        qDebug()<<(speedR+speedL/2);
         ir1 = (unsigned char)data.at(11);
         ir2 = (unsigned char)data.at(12);
         odoR=((((long) data.at(16) << 24))+(((long) data.at(15) << 16))+(((long) data.at(14) << 8))+((long) data.at(13)));

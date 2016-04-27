@@ -49,10 +49,6 @@ void Interface::initinterface()
         imgProc=false;
         bImshow=false;
         controllerOn=false;
-        /*ui->displayIR1->setNum(0);
-        ui->displayIR2->setNum(0);
-        ui->displayIR3->setNum(0);
-        ui->displayIR4->setNum(0);*/
         ui->displayVersion->setNum(0);
         ui->displayCurrent->setNum(0);
         ui->displaySpeed->setNum(0);
@@ -61,7 +57,6 @@ void Interface::initinterface()
         ui->pbSpeedRF->setValue(0);
         ui->pbSpeedLR->setValue(0);
         ui->pbSpeedRR->setValue(0);
-        ui->lblController->setPixmap(QPixmap());
         ui->frame->setPixmap(QPixmap());
         ui->frame->setText("NO SIGNAL");
         ui->displayIR1->setStyleSheet("QLabel {background-color : rgb(3,255,45); }");
@@ -79,6 +74,8 @@ void Interface::initConnect()
     QObject::connect(controller1,SIGNAL(controllerNewState(SimpleXbox360Controller::InputState)),this,SLOT(displayGamepadState(SimpleXbox360Controller::InputState)));
     QObject::connect(controller1,SIGNAL(controllerConnected(uint)),this,SLOT(GamepadConnected()));
     QObject::connect(controller1,SIGNAL(controllerDisconnected(uint)),this,SLOT(GamepadDisconnected()));
+    QObject::connect(this,SIGNAL(vibration(float,float)),controller1,SLOT(setVibration(float,float)));
+
 
     QObject::connect(this, SIGNAL(robotDisconnect()),Clientcont, SLOT(socketDisconnected()), Qt::QueuedConnection);
     QObject::connect(this, SIGNAL(camDisconnect()),Clientcam, SLOT(disconnect()), Qt::QueuedConnection);
@@ -223,6 +220,8 @@ void Interface::majConnectedState()
         {
             QPixmap mypix (":/image/image/connected.png");
             ui->colorConnected->setPixmap(mypix);
+            if(gamepadConnected)
+                emit vibration(1,0.4);
         }
         else if(robotconnected&&!camconnected)
         {
@@ -254,6 +253,8 @@ void Interface::majConnectedState()
             this->repaint();
             QPixmap mypix (":/image/image/disconnected.png");
             ui->colorConnected->setPixmap(mypix);
+            if(gamepadConnected)
+                emit vibration(1,0.4);
         }
     mutex.unlock();
 }
@@ -416,37 +417,17 @@ void Interface::setVitRight(int lvl)
 
 void Interface::setVitesseGlobal()
 {
-    mutex.lock();
-        int vitleft, vitright,rpmPerTics;
+    //mutex.lock();
+        int vitleft, vitright;
         //2048 / wheel turn     1 wheel turn =46.5cm speedL et speedR en tics/50ms
         int res;
         vitleft=speedL;
         vitright=speedR;
-        res=(int)((vitright+vitleft)/2);//tics/50ms
-        /*rpmPerTics=(int)((res*156)/240);
-        res=(int)(((rpmPerTics*0.5)*100)/60);*///en cm/s
-        res=res*20;//tics/s
-        res=(int)(res*0.023);//en cm/s
+        res=(int)((vitright+vitleft)/2);
+        res=res*20;
+        res=(int)res*0.019;
         ui->displaySpeed->setNum(res);
-    mutex.unlock();
-}
-
-int Interface::computeDistance(float lvl, float oldLvl)
-{
-    int res=255;
-    int lvltmp=lvl*(255/3.3);
-    if(!lvltmp==255)
-    {
-        if(lvl>oldLvl)
-        {
-            res=(int)((qPow(1.9, -4)*qPow(lvl, 2))+(qPow(4.6, -2)*lvl)+(3.27));
-        }
-        else if (lvl<oldLvl)
-        {
-            res=(int)(0.183*lvl);
-        }
-    }
-    return res;
+    //mutex.unlock();
 }
 
 void Interface::setIR1(int lvl)//Avant-Droit
@@ -458,7 +439,7 @@ void Interface::setIR1(int lvl)//Avant-Droit
             if(IR1>156)//30cm = trop prés
             {
                 emit robotFrontCollisionOn();
-                ui->displayIR1->setStyleSheet("QLabel {background-color : rgb(255,40,40); }");
+                ui->displayIR1->setStyleSheet("QLabel {background-color : rgb(255,40,40); }"); 
             }
             else
             {
@@ -568,6 +549,7 @@ void Interface::setOdoL(long odo)
     //mutex.lock();
         odoL=odo;
     //mutex.unlock();
+        computeDistance();
 }
 
 void Interface::setOdoR(long odo)
@@ -575,6 +557,15 @@ void Interface::setOdoR(long odo)
    // mutex.lock();
         odoR=odo;
     //mutex.unlock();
+        computeDistance();
+}
+
+void Interface::computeDistance()
+{
+    mutex.lock();
+        toltalDistance=(long)(odoR+odoL/2);
+        ui->displayDistance->setNum((int)toltalDistance);
+    mutex.unlock();
 }
 
 void Interface::getSliderCamValue()
@@ -968,7 +959,8 @@ void Interface::on_actionActiver_Manette_changed()
     if(controllerOn)
     {
         controllerOn=false;
-    }else
+    }
+    else
     {
         controllerOn=true;
     }
@@ -1060,80 +1052,115 @@ void Interface::displayGamepadState(SimpleXbox360Controller::InputState GamepadS
 
 void Interface::controller()
 {
-    if(gamepadConnected && controllerOn && robotconnected){
+    if(gamepadConnected)
+    {
+        if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_START))
+        {
+            mutex.lock();
+                Clientcont = ClientControl::getInstance((this->parent()),this);
+                Clientcam = ClientCamera::getInstance((this->parent()),this);
+            mutex.unlock();
 
+            initConnect();
+            emit robotConnect();
+            emit camConnect();
+            majConnectedState();
+        }
+        if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_BACK))
+        {
+            emit robotDisconnect();
+            emit camDisconnect();
+            initinterface();
+            majConnectedState();
+            mutex.lock();
+                Clientcont = ClientControl::getInstance((this->parent()),this);
+                Clientcam = ClientCamera::getInstance((this->parent()),this);
+            mutex.unlock();
+            initConnect();
+        }
         //BUTTONS ACTION
-        if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
+        if(robotconnected)
         {
-            emit moveCamera(9);
-        }
-        if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_RIGHT ))//droite
-        {
-            emit LeftSpeedFlag(0);
-            emit RightSpeedFlag(1);
-            emit LeftSpeed(180);
-            emit RightSpeed(180);
-        }
-        else if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_LEFT ))//gauche
-        {
-            emit LeftSpeedFlag(1);
-            emit RightSpeedFlag(0);
-            emit LeftSpeed(180);
-            emit RightSpeed(180);
-        }
-        else if((currentGamepadState.rightTrigger>currentGamepadState.leftTrigger) && (currentGamepadState.rightTrigger>0) &&(currentGamepadState.leftTrigger>0))
-        {
-            emit LeftSpeedFlag(1);
-            emit RightSpeedFlag(1);
-            if(currentGamepadState.leftThumbX>0)
+            if(currentGamepadState.rightTrigger>currentGamepadState.leftTrigger)
             {
-                emit LeftSpeed((int)(currentGamepadState.rightTrigger*240));
-                emit RightSpeed((int)(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX)));
+                if(currentGamepadState.leftThumbX>0)
+                {
+                    emit LeftSpeedFlag(1);
+                    emit RightSpeedFlag(1);
+                    emit LeftSpeed((int)(currentGamepadState.rightTrigger*240));
+                    emit RightSpeed((int)((currentGamepadState.rightTrigger*240)-(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX))));
+                }
+                else if(currentGamepadState.leftThumbX<0)
+                {
+                    emit LeftSpeedFlag(1);
+                    emit RightSpeedFlag(1);
+                    emit LeftSpeed((int)((currentGamepadState.rightTrigger*240)-(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX))));
+                    emit RightSpeed((int)(currentGamepadState.rightTrigger*240));
+                }
+                else
+                {
+                    emit LeftSpeedFlag(1);
+                    emit RightSpeedFlag(1);
+                    emit LeftSpeed((int)(currentGamepadState.rightTrigger*240));
+                    emit RightSpeed((int)(currentGamepadState.rightTrigger*240));
+                }
+
+            }
+            else if(currentGamepadState.rightTrigger<currentGamepadState.leftTrigger)
+            {
+                if(currentGamepadState.leftThumbX>0)
+                {
+                    emit LeftSpeedFlag(0);
+                    emit RightSpeedFlag(0);
+                    emit LeftSpeed((int)(currentGamepadState.leftTrigger*240));
+                    emit RightSpeed((int)((currentGamepadState.leftTrigger*240)-(currentGamepadState.leftTrigger*240*qFabs(currentGamepadState.leftThumbX))));
+                }
+                else if(currentGamepadState.leftThumbX<0)
+                {
+                    emit LeftSpeedFlag(0);
+                    emit RightSpeedFlag(0);
+                    emit LeftSpeed((int)((currentGamepadState.leftTrigger*240)-(currentGamepadState.leftTrigger*240*qFabs(currentGamepadState.leftThumbX))));
+                    emit RightSpeed((int)(currentGamepadState.leftTrigger*240));
+                }
+                else
+                {
+                    emit LeftSpeedFlag(0);
+                    emit RightSpeedFlag(0);
+                    emit LeftSpeed((int)(currentGamepadState.leftTrigger*240));
+                    emit RightSpeed((int)(currentGamepadState.leftTrigger*240));
+                }
             }
             else
             {
-                emit LeftSpeed((int)(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX)));
-                emit RightSpeed((int)(currentGamepadState.rightTrigger*240));
+                emit LeftSpeedFlag(0);
+                emit RightSpeedFlag(0);
+                emit LeftSpeed(0);
+                emit RightSpeed(0);
             }
-
         }
-        else
+
+        if(camconnected)
         {
-            emit LeftSpeedFlag(0);
-            emit RightSpeedFlag(0);
-            if(currentGamepadState.leftThumbX>0)
+            if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_A))
             {
-                emit LeftSpeed((int)(currentGamepadState.rightTrigger*240));
-                emit RightSpeed((int)(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX)));
+                emit moveCamera(9);
             }
-            else
+            if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_RIGHT ))//droite
             {
-                emit LeftSpeed((int)(currentGamepadState.rightTrigger*240*qFabs(currentGamepadState.leftThumbX)));
-                emit RightSpeed((int)(currentGamepadState.rightTrigger*240));
+                emit moveCamera(4);
+            }
+            else if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_LEFT ))//gauche
+            {
+                emit moveCamera(3);
+            }
+            else if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_UP ))//gauche
+            {
+                emit moveCamera(1);
+            }
+            else if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_DOWN ))//gauche
+            {
+                emit moveCamera(2);
             }
         }
-
-        if(currentGamepadState.isButtonPressed(XINPUT_GAMEPAD_DPAD_RIGHT ))//droite
-        {
-            emit moveCamera(9);
-        }
-
-        if(currentGamepadState.rightThumbX>0)//droite
-        {
-            emit moveCamera(4);
-        }
-        if(currentGamepadState.rightThumbX<0)//gauche
-        {
-            emit moveCamera(3);
-        }
-        if(currentGamepadState.rightThumbY>0)//haut
-        {
-            emit moveCamera(1);
-        }
-        if(currentGamepadState.rightThumbY<0)//bas
-        {
-            emit moveCamera(2);
-        }
-
     }
 }

@@ -941,7 +941,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="lblVersion_2">
+   <widget class="QLabel" name="lblDistance">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -954,7 +954,7 @@
      <string>Distance :</string>
     </property>
    </widget>
-   <widget class="QLabel" name="displayVersion_2">
+   <widget class="QLabel" name="displayDistance">
     <property name="geometry">
      <rect>
       <x>60</x>
@@ -984,9 +984,6 @@
     </property>
     <property name="text">
      <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="remotebot.qrc">:/image/image/controller.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -1028,8 +1025,8 @@
    <zorder>displayIR3</zorder>
    <zorder>displayVersion</zorder>
    <zorder>lblVersion</zorder>
-   <zorder>lblVersion_2</zorder>
-   <zorder>displayVersion_2</zorder>
+   <zorder>lblDistance</zorder>
+   <zorder>displayDistance</zorder>
    <zorder>displayCurrent</zorder>
    <zorder>colorConnected</zorder>
    <zorder>lblCurrent</zorder>
@@ -1054,7 +1051,6 @@
       <string>Options</string>
      </property>
      <addaction name="actionActiver_Traitement_Image"/>
-     <addaction name="actionActiver_Manette"/>
      <addaction name="actionImshow_OpenCV"/>
     </widget>
     <addaction name="actionPort_et_IP"/>
