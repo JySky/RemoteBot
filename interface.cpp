@@ -564,6 +564,7 @@ void Interface::computeDistance()
 {
     mutex.lock();
         toltalDistance=(long)(odoR+odoL/2);
+        toltalDistance=(long)toltalDistance*0.019;
         ui->displayDistance->setNum((int)toltalDistance);
     mutex.unlock();
 }
