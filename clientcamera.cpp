@@ -344,7 +344,7 @@ void ClientCamera::imageProcessing(bool i)
         blur(gray, edge, Size(3,3));
         Canny(edge, edge, edgeThresh, edgeThresh*3, 3);
         cedge = Scalar::all(0);
-        image.copyTo(cedge, edge);
+        frame.copyTo(cedge, edge);
         imshow("Edge map", cedge);
         /*vector<Mat> colors;
         Mat resframe = frame;
